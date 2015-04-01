@@ -17,7 +17,7 @@
   (demo 2 (pan2 (saw 200))))
 
 ;; multi-channel expansion
-(comment 
+(comment
   (demo 2 (saw [199 200]))
   (demo 2 (saw [199 200 201]))
   (demo 2 (pan2 (mix (pulse [199 200 201]))))
@@ -33,7 +33,7 @@
         freqs [(+ 1 freq) freq (- 1 freq)]]
       (out 0 (pan2 (mix (saw freqs))))))
 
-(comment 
+(comment
   (def s (my-saw))
   (ctl s :note (note :C5))
   (ctl s :note (note :B#4))
@@ -54,7 +54,7 @@
          wob   (+ wob (bpf wob 1500 2))]
      (+ wob (* 0.2 (g-verb wob 9 0.7 0.7))))))
 
-(comment 
+(comment
   (demo 3 (wobble (saw [99 100 101]) 3))
   (demo 3 (wobble (mix (saw [99 100 101])) 3)))
 
@@ -74,6 +74,7 @@
   (def ch (inst-fx! multi-osc fx-chorus))
   (ctl ch :rate 0.02)
   (ctl ch :rate 0.2)
-  (clear-fx multi-osc)   
+  (clear-fx multi-osc)
   (stop))
 
+;; envelope
