@@ -3,7 +3,7 @@
   (:require [overtone-workshop.patterns :refer :all]
             [overtone-workshop.player :refer :all]))
 
-(definst lead [note 60 release 0.25 gate 0.4 sub-gate 0.0]
+(definst lead [note 60 release 0.25 gate 0.4 sub-gate 0.5]
   (let [freq  (midicps note)
         freq2 (midicps (+ note 0.08))
         freq3 (midicps (+ note 0.20))
@@ -16,7 +16,7 @@
     (pan2:ar (* mix env))))
 
 (comment
-  (lead)
+  (lead :sub-gate 0.5)
   (def rv (inst-fx! lead fx-freeverb))
   (def ch (inst-fx! lead fx-chorus))
   (def eh (inst-fx! lead fx-echo))
@@ -33,21 +33,22 @@
     ::handler)
   (remove-event-handler ::handler))
 
-(defn play-synth [controls]
+(defn play-lead [controls]
   (partial lead))
 
-(def nome (metronome 128))
+(def lead-nome (metronome 128))
 
-(defn lead-player [pattern]
-  (simple-player {:pattern pattern :nome nome :beat (nome) :synth-fn play-synth}))
-
-(comment
-  (lead-player letsgo))
+(defn lead-player [pattern beats resolution]
+  (simple-player {:pattern pattern :nome lead-nome :beat (lead-nome) :synth-fn play-lead :beats beats :resolution resolution}))
 
 (comment
-  (lead-player animals))
+  (lead-player letsgo 16 64))
 
 (comment
-  (lead-player ratherbe))
+  (lead-player animals 16 64))
+
+(comment
+  (lead-player ratherbe 32 128))
 
 (stop)
+
