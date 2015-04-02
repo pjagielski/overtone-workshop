@@ -72,6 +72,23 @@
 (defn play-syntorial [step-ctrl]
   (partial-syntorial (merge @syntorial-controls step-ctrl)))
 
+(def kick (sample "resources/kick.wav"))
+(def clap (sample "resources/clap.wav"))
+(def tambo (sample "resources/tambo.wav"))
+
+(kick)
+
+(defn beat-player [nome beat]
+  (let [next-beat (+ 2 beat)]
+    (at (nome beat) (kick))
+    (at (nome (+ 0.5 beat)) (tambo))
+    (at (nome (+ 1 beat)) (do (kick) (clap)))
+    (at (nome (+ 1.5 beat)) (tambo))
+    (apply-at (nome next-beat) beat-player [nome next-beat])))
+
+(defn next-beat [nome]
+  (+ (* 16 (int (/ (nome) 16))) 16))
+
 (comment
   (untztrument partial-syntorial syntorial-controls controls)
   (untztrument partial-lead lead-controls controls)
@@ -79,8 +96,7 @@
   (remove-event-handler ::untztrument-note)
   (player ratherbe {} nome (nome) partial-syntorial syntorial-controls 32 128)
   (swap! syntorial-controls assoc :osc2-semi -12, :master-volume 4.0, :osc1-waveform 0, :osc-mix 0.5, :release 0.1, :amp 0.3, :osc1-semi 0, :osc2-pulsewidth 0.95, :sustain 0.2, :osc2-waveform 1, :attack 0.01, :cutoff 0.65, :osc1-pulsewidth 0.95)
-  (defn next-beat [nome]
-    (+ (* 16 (int (/ (nome) 16))) 16))
+  (beat-player nome (next-beat nome))
   (player letsgo {} nome (next-beat nome) play-lead 16 64)
   (player letsgo-bass letsgo-bass-ctrl nome (next-beat nome) play-syntorial 16 64)
   (stop)
