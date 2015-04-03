@@ -12,7 +12,7 @@
         step (/ (- next-beat-at t) resolution)]
     (dorun (for [[idx chord] pattern]
       (play-step step idx t chord (get pattern-ctrl idx) synth-fn)))
-    (apply-at next-beat-at player [pattern pattern-ctrl nome next-beat synth-fn beats resolution])))
+    (apply-by next-beat-at player [pattern pattern-ctrl nome next-beat synth-fn beats resolution])))
 
 (defn simple-player [{:keys [:pattern :pattern-ctrl :nome :beat :synth-fn :beats :resolution]
                       :or {:beats 16 :resolution 64 :pattern-ctrl {}}}]

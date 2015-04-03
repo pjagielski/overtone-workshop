@@ -66,7 +66,7 @@
 ;; detuning
 (definst multi-osc [note 60 osc2-semi 0 amp 0.3]
   (let [freq  (midicps note)
-        osc1  (pulse freq)
+        osc1  (saw freq)
         freq2 (midicps (+ note osc2-semi))
         osc2  (saw freq2)
         snd   (+ osc1 osc2)]
@@ -80,10 +80,8 @@
   (ctl m :osc2-semi 12)
   (ctl m :osc2-semi 24)
   (ctl m :osc2-semi 7)
-  (ctl m :osc2-semi 7.08)
-  (ctl m :osc2-semi 7.16)
-  (ctl m :osc2-semi 11.96)
   (ctl m :osc2-semi 0.08)
+  (ctl m :osc2-semi 0.16)
   (ctl m :osc2-semi 0.60)
   (ctl m :osc2-semi 0.80)
   (stop))
@@ -139,4 +137,14 @@
   (play-chord (chord :C3 :m11) my-lead)
   (play-chord (map note [:G#5 :C#5 :F4]) my-lead) 
   (play-chord (map note [:B6 :G6 :B5 :G5 :B4]) my-lead))
+
+(comment
+  (on-event [:midi :note-on]
+    (fn [{note :note}] (my-lead note))
+    ::midi-player)
+  (remove-event-handler ::midi-player)
+  (on-event [:midi :note-on]
+    (fn [{note :note}] (play-chord (chord (find-note-name (- note 12)) :7sus4) my-lead))
+    ::midi-player)
+  (remove-event-handler ::midi-player))
 
