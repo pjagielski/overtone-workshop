@@ -17,3 +17,4 @@
 (defn simple-player [{:keys [:pattern :pattern-ctrl :nome :beat :synth-fn :beats :resolution]
                       :or {:beats 16 :resolution 64 :pattern-ctrl {}}}]
   (player pattern pattern-ctrl nome beat synth-fn beats resolution))
+

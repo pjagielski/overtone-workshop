@@ -1,7 +1,7 @@
 (ns overtone-workshop.syntorial
   (:use [overtone.live])
   (:require [overtone-workshop.player :refer :all]
-            [overtone-workshop.lead :refer :all]  
+            [overtone-workshop.lead :refer :all]
             [overtone-workshop.patterns :refer :all]))
 
 (def wave {:saw 0 :pulse 1})
@@ -11,7 +11,7 @@
 (definst syntorial-synth
   [note 60 amp 1.0 osc1-waveform 0 osc1-pulsewidth 0.50 osc1-semi 0
    osc2-waveform 0 osc2-pulsewidth 0.50 osc2-semi 0 osc-mix 0.00
-   cutoff 1.0 resonance 1.0 
+   cutoff 1.0 resonance 1.0
    attack 0.015 sustain 0.2 release 0.015
    master-volume 0.0]
   (let [note1-freq  (midicps (+ note osc1-semi))
@@ -95,7 +95,8 @@
   (swap! controls assoc 1 {:param :resonance :min 0.1 :max 1.0})
   (remove-event-handler ::untztrument-control)
   (remove-event-handler ::untztrument-note)
-  (player ratherbe {} nome (nome) partial-syntorial syntorial-controls 32 128)
+  (player ratherbe {} nome (nome) play-syntorial 32 128)
+  (player derezed {} nome (nome) play-syntorial 8 32)
   (swap! syntorial-controls assoc :osc2-semi -12, :master-volume 4.0, :osc1-waveform 0, :osc-mix 0.5, :release 0.1, :amp 0.3, :osc1-semi 0, :osc2-pulsewidth 0.95, :sustain 0.2, :osc2-waveform 1, :attack 0.01, :cutoff 0.65, :osc1-pulsewidth 0.95 :resonance 1.0)
   (player letsgo-bass letsgo-bass-ctrl nome (nome) play-syntorial 16 64)
   (beat-player nome (next-beat nome))

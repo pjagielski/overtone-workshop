@@ -22,7 +22,7 @@
   (demo 2 (saw [199 200]))
   (demo 2 (saw [199 200 201]))
   (demo 2 (pan2 (mix (pulse [199 200]))))
-  (demo 2 (pan2 (mix (saw [199 200])))) 
+  (demo 2 (pan2 (mix (saw [199 200]))))
   (demo 2 (pan2 (mix (saw [99 100 101])))))
 
 ;; notes
@@ -91,7 +91,7 @@
 (note :G#2)
 
 (comment
-  (demo 3 (wobble (saw [102 103 104]) 3)) 
+  (demo 3 (wobble (saw [102 103 104]) 3))
   (demo 3 (wobble (saw [99 103 107]) 3)))
 
 ;; envelope
@@ -102,14 +102,14 @@
   (my-saw)
   (stop))
 
-(definst my-env-saw [note 60 attack 0.01 sustain 0.4 release 0.1] 
+(definst my-env-saw [note 60 attack 0.01 sustain 0.4 release 0.1]
   (* (env-gen (env-lin attack sustain release))
      (saw (midicps note))))
 
 (comment
   (my-env-saw)
-  (my-env-saw :sustain 1.0) 
-  (my-env-saw :attack 0.5) 
+  (my-env-saw :sustain 1.0)
+  (my-env-saw :attack 0.5)
   (my-env-saw :attack 0.5 :release 0.5))
 
 ;; chords
@@ -123,7 +123,7 @@
   (play-chord (chord :C4 :major) (partial my-env-saw :sustain 1.0))
   (play-chord (map note [:G#5 :C#5 :F4]) my-env-saw))
 
-(definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.1]
+(definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.2]
   (let [freqs [(midicps note) (midicps (+ note 0.08))]]
     (* (env-gen (env-lin attack sustain release))
        (saw freqs))))
@@ -135,7 +135,7 @@
   (play-chord (chord :C4 :7sus4) my-lead)
   (play-chord (chord :C4 :m13) my-lead)
   (play-chord (chord :C3 :m11) my-lead)
-  (play-chord (map note [:G#5 :C#5 :F4]) my-lead) 
+  (play-chord (map note [:G#5 :C#5 :F4]) my-lead)
   (play-chord (map note [:B6 :G6 :B5 :G5 :B4]) my-lead))
 
 (comment
@@ -144,7 +144,17 @@
     ::midi-player)
   (remove-event-handler ::midi-player)
   (on-event [:midi :note-on]
-    (fn [{note :note}] (play-chord (chord (find-note-name (- note 12)) :7sus4) my-lead))
+    (fn [{note :note}] (play-chord (chord (find-note-name (+ note 12)) :7sus4) my-lead))
+    ::midi-player)
+  (remove-event-handler ::midi-player)
+  (def chords {60 [:B6 :G6 :B5 :G5 :B4]
+               61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
+               62 [:C7 :E6 :C6 :G5 :C5]
+               63 [:F#7 :D7 :F#6 :D6 :A5 :D5]
+               67 [:G7 :E7 :G6 :E6 :B5 :E5]})
+  (def l (partial my-lead :sustain 0.2))
+  (on-event [:midi :note-on]
+    (fn [{n :note}] (play-chord (map note (get chords n)) l))
     ::midi-player)
   (remove-event-handler ::midi-player))
 

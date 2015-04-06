@@ -65,3 +65,12 @@
        (repeat-line 80 ratherbe-sec)
        (repeat-line 96 ratherbe-end1)
        (repeat-line 112 ratherbe-end2)))
+
+(def derezed-line
+  {0 [:E4] 3 [:G4] 6 [:E4] 8 [:E5] 9 [:B4] 10 [:G4] 11 [:D4] 12 [:A4] 13 [:E4] 14 [:G4] 15 [:A4]})
+
+(def derezed
+  (conj
+    (repeat-line 0 derezed-line)
+    (repeat-line 16 derezed-line)))
+
