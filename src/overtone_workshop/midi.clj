@@ -9,13 +9,8 @@
 (swap! synth-controls assoc :cutoff 0.53 :fil-amt 0 :fil-dec 0)
 
 (defn play-bass [step-ctl]
-  (let [partial-fn (partial bass
-                 :fil-amt (get @synth-controls :fil-amt)
-                 :fil-dec (get @synth-controls :fil-dec)
-                 :cutoff (get @synth-controls :cutoff))]
-  (if-let [sustain (get step-ctl :sustain)]
-    (partial partial-fn :sustain sustain)
-    partial-fn)))
+  (let [controls (merge @synth-controls step-ctl)]
+    (reduce-kv (fn [f key val] (partial f key val)) bass controls)))
 
 (defn untztrument [play-fn synth-controls controls]
   (on-event [:midi :control-change]
