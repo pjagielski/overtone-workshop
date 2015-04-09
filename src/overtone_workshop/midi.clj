@@ -1,8 +1,30 @@
 (ns overtone-workshop.midi
   (:use [overtone.live])
   (:require [overtone-workshop.player :refer :all]
+            [overtone-workshop.sounds :refer [my-lead]]
             [overtone-workshop.patterns :refer :all]
             [overtone-workshop.letsgo :refer [bass]]))
+
+(comment
+  (midi-connected-devices)
+  (on-event [:midi :note-on]
+    (fn [{note :note}] (my-lead note))
+    ::midi-player)
+  (remove-event-handler ::midi-player)
+  (on-event [:midi :note-on]
+    (fn [{note :note}] (play-chord (chord (find-note-name (+ note 12)) :7sus4) my-lead))
+    ::midi-player)
+  (remove-event-handler ::midi-player)
+  (def chords {60 [:B6 :G6 :B5 :G5 :B4]
+               61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
+               62 [:C7 :E6 :C6 :G5 :C5]
+               63 [:F#7 :D7 :F#6 :D6 :A5 :D5]
+               67 [:G7 :E7 :G6 :E6 :B5 :E5]})
+  (def l (partial my-lead :sustain 0.2))
+  (on-event [:midi :note-on]
+    (fn [{n :note}] (play-chord (map note (get chords n)) l))
+    ::midi-player)
+  (remove-event-handler ::midi-player))  
 
 (def synth-controls (atom {}))
 (#_ (swap! synth-controls assoc :cutoff 0.43 :fil-amt 1000 :fil-dec 0.5))
