@@ -1,7 +1,15 @@
 (ns overtone-workshop.sounds
-  (use [overtone.live]))
+  (use [overtone.live])
+  (require [overtone.inst.synth :refer [supersaw]]))
 
-;; oscilators
+;;   ╭-╮
+;;   | | |     =>   ---╲___    =>     /\
+;;     ╰-╯                           /  \
+;;
+;;  signal           filter        amplitude
+
+
+;; signals (oscilators)
 (comment
   (demo 2 (sin-osc 440))
   (demo 2 (saw 440))
@@ -95,6 +103,11 @@
   (demo 3 (wobble (saw [99 103 107]) 3)))
 
 ;; envelope
+;;
+;;  /\___
+;; /     \
+;; A D S R
+
 (definst my-saw [note 60]
   (pan2 (saw (midicps note))))
 
