@@ -79,5 +79,25 @@
   (live-sequencer nome live-pats 1/4 0 (nome))
   (stop))
 
+(defsynth dubstep [bpm 100 wobble 1 note 29 v 1 out-bus 0]
+ (let [trig (impulse:kr (/ bpm 120))
+       freq (midicps note)
+       swr (demand trig 0 (dseq [wobble] INF))
+       sweep (lin-exp (lf-tri swr) -1 1 40 3000)
+       wob (apply + (saw (* freq [0.99 1.01])))
+       wob (lpf wob sweep)
+       wob (* 0.5 (normalizer wob))
+       wob (+ wob (bpf wob 1500 2))
+       wob (+ wob (* 0.2 (g-verb wob 11 0.7 0.7)))]
+   (out out-bus wob)))
 
+(defn skrillex [d nome]
+  (let [time (now) beat (nome)]
+    (at (nome) (ctl d :wobble 1.5 :note 29))
+    (at (nome (+ 2 beat)) (ctl d :wobble 4 :note 40))
+    (at (nome (+ 4 beat)) (ctl d :wobble 6 :note 45))
+    (apply-by (nome (+ 6 beat)) skrillex [d nome])))
 
+(comment
+  (skrillex (dubstep) nome)
+  (stop))
