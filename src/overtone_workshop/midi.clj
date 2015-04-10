@@ -1,20 +1,24 @@
 (ns overtone-workshop.midi
   (:use [overtone.live])
   (:require [overtone-workshop.player :refer :all]
-            [overtone-workshop.sounds :refer [my-lead]]
+            [overtone-workshop.sounds :refer [my-lead play-chord]]
             [overtone-workshop.patterns :refer :all]
+            [overtone-workshop.timing :refer [kick snare hat]]
             [overtone-workshop.letsgo :refer [bass]]))
 
 (comment
   (midi-connected-devices)
+
   (on-event [:midi :note-on]
     (fn [{note :note}] (my-lead note))
     ::midi-player)
   (remove-event-handler ::midi-player)
+
   (on-event [:midi :note-on]
-    (fn [{note :note}] (play-chord (chord (find-note-name (+ note 12)) :7sus4) my-lead))
+    (fn [{note :note}] (play-chord (chord (find-note-name note) :7sus4) my-lead))
     ::midi-player)
   (remove-event-handler ::midi-player)
+
   (def chords {60 [:B6 :G6 :B5 :G5 :B4]
                61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
                62 [:C7 :E6 :C6 :G5 :C5]
@@ -24,15 +28,34 @@
   (on-event [:midi :note-on]
     (fn [{n :note}] (play-chord (map note (get chords n)) l))
     ::midi-player)
-  (remove-event-handler ::midi-player))  
+  (remove-event-handler ::midi-player)
+
+  (def drums {60 kick 61 snare 62 hat})
+  (on-event [:midi :note-on]
+    (fn [{n :note}] (apply (get drums n) []))
+    ::midi-player)
+  (remove-event-handler ::midi-player))
 
 (def synth-controls (atom {}))
 (#_ (swap! synth-controls assoc :cutoff 0.43 :fil-amt 1000 :fil-dec 0.5))
 (swap! synth-controls assoc :cutoff 0.53 :fil-amt 0 :fil-dec 0)
 
+(comment
+  (bass)
+  (def bb (partial bass :note 50))
+  (bb)
+  (def lb (partial (partial bass :cutoff 0.6) :note 40))
+  (lb)
+  (def tb (-> bass
+              (partial :cutoff 0.6)
+              (partial :note 40)))
+  (tb)
+  (def rd (reduce (fn [f [key val]] (partial f key val)) bass {:cutoff 0.6 :note 40}))
+  (rd))
+
 (defn play-bass [step-ctl]
   (let [controls (merge @synth-controls step-ctl)]
-    (reduce-kv (fn [f key val] (partial f key val)) bass controls)))
+    (reduce (fn [f [key val]] (partial f key val)) bass controls)))
 
 (defn untztrument [play-fn synth-controls controls]
   (on-event [:midi :control-change]
@@ -54,7 +77,10 @@
 
 (comment
   (untztrument play-bass synth-controls controls)
+  (remove-event-handler ::untztrument-note)
+  (remove-event-handler ::untztrument-control)
   (let [beat (nome)]
     (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64))
+  (println @synth-controls)
   (stop))
 

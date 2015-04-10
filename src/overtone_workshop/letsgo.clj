@@ -3,7 +3,7 @@
   (:require [overtone-workshop.player :refer :all]
             [overtone-workshop.patterns :refer :all]))
 
-(definst lead [note 60 release 0.30 gate 0.3 sub-gate 0.25]
+(definst lead [note 60 release 0.30 gate 0.3 sub-gate 0.2]
   (let [freq  (midicps note)
         freq2 (midicps (+ note 0.08))
         freq3 (midicps (+ note 0.20))
@@ -12,7 +12,7 @@
         osc   (saw:ar [freq freq2 freq3 freq4 freq5])
         sub   (lpf (pulse (* freq 0.5) 0.3) 500)
         osc   (+ (* sub-gate sub) (* gate osc))
-        mix   (mix osc 1.0 0.3)
+        mix   (mix osc)
         env   (env-gen (env-lin 0.015 0.20 release) :action FREE)]
     (pan2:ar (* mix env))))
 
@@ -67,7 +67,6 @@
     (beat-player nome beat)
     (noise-player nome beat)
     (player letsgo {} nome beat play-lead 16 64)
-    (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64)
-    )
+    (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64))
   (stop))
 

@@ -27,10 +27,11 @@
 
 ;; multi-channel expansion
 (comment
+  (demo 2 (saw [200 200]))
   (demo 2 (saw [199 200]))
   (demo 2 (saw [199 200 201]))
-  (demo 2 (pan2 (mix (pulse [199 200]))))
   (demo 2 (pan2 (mix (saw [199 200]))))
+  (demo 2 (pan2 (mix (pulse [199 200]))))
   (demo 2 (pan2 (mix (saw [99 100 101])))))
 
 ;; notes
@@ -136,9 +137,9 @@
   (play-chord (chord :C4 :major) (partial my-env-saw :sustain 1.0))
   (play-chord (map note [:G#5 :C#5 :F4]) my-env-saw))
 
-(definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.2]
+(definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.2 amp 0.4]
   (let [freqs [(midicps note) (midicps (+ note 0.08))]]
-    (* (env-gen (env-lin attack sustain release))
+    (* amp (env-gen (env-lin attack sustain release))
        (saw freqs))))
 
 (comment

@@ -4,7 +4,8 @@
 ;; samples
 (def kick (freesound-sample 192248))
 (def snare (freesound-sample 82583))
-(def hat (freesound-sample 165027))
+;(def hat (freesound-sample 165027))
+(def hat (sample "resources/tambo.wav"))
 
 (comment
   (kick)
@@ -75,7 +76,7 @@
   (nome :bpm 90)
   (reset! live-pats {kick  [1 _ _ _ _ _ _ 1 _ 1 1 _ _ 1 _ 1 1 _ _ _ _ _ _ 1 _ 1 1 _ 1 _ 1 _]
                      snare [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ _ _ _ _ _ _ _ _]
-                     hat   [_ _ _ _ _ _ 1 _ 1 _ 1 _ _ _ 1 _ 1 _ 1 _ 1 _ 1 _ _ _ _ _ _ _ _ _]})
+                     hat   [_ _ _ _ _ _ 1 _ 1 _ 1 _ _ _ 1 _ 1 _ 1 _ _ _ _ _ _ _ _ _ _ _ _ _]})
   (live-sequencer nome live-pats 1/4 0 (nome))
   (stop))
 
@@ -99,5 +100,11 @@
     (apply-by (nome (+ 6 beat)) skrillex [d nome])))
 
 (comment
+  (def d (dubstep 120))
+  (ctl d :wobble 4)
+  (ctl d :wobble 8)
+  (ctl d :wobble 2 :note 31)
+  (skrillex (dubstep (nome :bpm)) nome)
   (skrillex (dubstep) nome)
   (stop))
+
