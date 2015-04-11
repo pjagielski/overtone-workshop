@@ -16,7 +16,7 @@
         env   (env-gen (env-lin 0.015 0.20 release) :action FREE)]
     (pan2:ar (* mix env))))
 
-(definst bass [note 60 amp 0.7 osc-mix 0.3 cutoff 0.23 sustain 0.2 release 0.15 fil-dec 0.85 fil-amt 1500]
+(definst bass [note 60 amp 0.7 osc-mix 0.3 cutoff 0.1 sustain 0.2 release 0.15 fil-dec 0.45 fil-amt 1000]
   (let [freq (midicps note)
         sub-freq (midicps (- note 12))
         osc1 (saw:ar freq)
@@ -55,7 +55,7 @@
 (defn play-lead [step-ctl]
   (partial lead))
 
- (defn play-bass [step-ctl]
+(defn play-bass [step-ctl]
   (if-let [sustain (get step-ctl :sustain)]
     (partial bass :sustain sustain)
     (partial bass)))
