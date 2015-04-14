@@ -76,6 +76,6 @@
       (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64)))
 
 (comment
-  (play-all)
+  (play-all nome)
   (stop))
 
