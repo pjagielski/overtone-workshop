@@ -66,6 +66,7 @@
     (apply-by (nome next-beat) live-sequencer [nome live-patterns scale (inc idx) next-beat])))
 
 (comment
+  (nome :bpm 128)
   (live-sequencer nome live-pats 1/2 0 (nome))
   (swap! live-pats assoc kick [1 _ _ 1 _ 1 _ 1])
   (swap! live-pats assoc hat [_ 1 _ 1 _ 1 _ 1])

@@ -11,14 +11,15 @@
 
 ;; signals (oscilators)
 (comment
-  (demo 2 (sin-osc 440))
-  (demo 2 (saw 440))
-  (demo 2 (pulse 440))
-  (demo 2 (pulse 440 0.95))
-  (demo 2 (pulse 440 0.15))
-  (demo 2 (lf-tri 440))
+  (demo 2 (sin-osc))
+  (demo 2 (saw))
+  (demo 2 (pulse))
+  (demo 2 (pulse :width 0.95))
+  (demo 2 (pulse :width 0.15))
+  (demo 2 (sin-osc 220))
   (demo 2 (saw 300))
   (demo 2 (saw 200))
+  (demo 2 (white-noise)) 
   (demo 2 (pink-noise)))
 
 ;; stereo
@@ -69,7 +70,7 @@
      (+ wob (* 0.2 (g-verb wob 9 0.7 0.7))))))
 
 (comment
-  (demo 3 (wobble (saw [99 100 101]) 3))
+  (demo 3 (wobble (saw [99 100]) 3))
   (demo 3 (wobble (mix (saw [99 100 101])) 3)))
 
 ;; detuning
