@@ -13,7 +13,7 @@ Install [jack](https://github.com/overtone/overtone/wiki/Installing-and-starting
 ```clojure
 (use 'overtone.live)
 (use 'overtone-workshop.letsgo)
-(play-all)
+(play-all (metronome 128))
 (stop)
 ```
 
