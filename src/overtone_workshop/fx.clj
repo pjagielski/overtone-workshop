@@ -14,6 +14,8 @@
   (inst-fx! ks1-demo fx-distortion)
   (inst-fx! ks1-demo fx-echo)
   (clear-fx ks1-demo)
+  (ks1-demo 60)
+  (ks1-demo 40)
   (stop))
 
 (def count-down (sample (freesound-path 71128)))

@@ -19,7 +19,7 @@
   (demo 2 (sin-osc 220))
   (demo 2 (saw 300))
   (demo 2 (saw 200))
-  (demo 2 (white-noise)) 
+  (demo 2 (white-noise))
   (demo 2 (pink-noise)))
 
 ;; stereo
@@ -42,7 +42,7 @@
 ;; synth
 (defsynth my-saw [note 60]
   (let [freq (midicps note)
-        freqs [(+ 1 freq) freq (- 1 freq)]]
+        freqs [(- 1 freq) freq (+ 1 freq)]]
       (out 0 (pan2 (mix (saw freqs))))))
 
 (comment
@@ -117,26 +117,30 @@
   (my-saw)
   (stop))
 
-(definst my-env-saw [note 60 attack 0.01 sustain 0.4 release 0.1]
+;;  /---\
+;; /     \
+;; A  S  R
+
+(definst my-env-synth [note 60 attack 0.01 sustain 0.4 release 0.1]
   (* (env-gen (env-lin attack sustain release))
-     (saw (midicps note))))
+     (sin-osc (midicps note))))
 
 (comment
-  (my-env-saw)
-  (my-env-saw :sustain 1.0)
-  (my-env-saw :attack 0.5)
-  (my-env-saw :attack 0.5 :release 0.5))
+  (my-env-synth)
+  (my-env-synth :sustain 1.0)
+  (my-env-synth :attack 0.5)
+  (my-env-synth :attack 0.5 :release 0.5))
 
 ;; chords
 (defn play-chord [a-chord inst]
   (doseq [note a-chord] (inst :note note)))
 
 (comment
-  (play-chord (chord :C4 :major) my-env-saw)
-  (play-chord (chord :G3 :major) my-env-saw)
-  (play-chord (chord :F3 :sus4) my-env-saw)
-  (play-chord (chord :C4 :major) (partial my-env-saw :sustain 1.0))
-  (play-chord (map note [:G#5 :C#5 :F4]) my-env-saw))
+  (play-chord (chord :C4 :major) my-env-synth)
+  (play-chord (chord :G3 :major) my-env-synth)
+  (play-chord (chord :F3 :sus4) my-env-synth)
+  (play-chord (chord :C4 :major) (partial my-env-synth :sustain 1.0))
+  (play-chord (map note [:G#5 :C#5 :F4]) my-env-synth))
 
 (definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.2 amp 0.4]
   (let [freqs [(midicps note) (midicps (+ note 0.08))]]
