@@ -1,6 +1,6 @@
 # overtone-workshop
 
-Basic introduction to sound synthesis, rhythms and effects using Overtone and Clojure.
+Basic introduction to sound synthesis, rhythms and effects using [Overtone](https://github.com/overtone/overtone) and [Clojure](https://github.com/clojure/clojure).
 
 ## Running (final song)
 
