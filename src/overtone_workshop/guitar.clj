@@ -3,6 +3,7 @@
         [overtone.synth.stringed]))
 
 (def g (guitar))
+(stop)
 
 (comment
   (guitar-strum g :E :down 0.25)

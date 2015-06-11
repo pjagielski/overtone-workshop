@@ -3,19 +3,23 @@
   (:require [overtone-workshop.player :refer :all]
             [overtone-workshop.sounds :refer [my-lead play-chord]]
             [overtone-workshop.patterns :refer :all]
-            [overtone-workshop.timing :refer [kick snare hat]]
+            [overtone-workshop.timing :refer [kick snare hat dubstep]]
             [overtone-workshop.letsgo :refer [bass]]))
+
+(def dp {60 (sample "resources/harder.wav")
+         61 (sample "resources/better.wav")
+         62 (sample "resources/faster.wav")
+         63 (sample "resources/stronger.wav")
+         64 (sample "resources/work_it.wav")
+         65 (sample "resources/make_it.wav")
+         66 (sample "resources/do_it.wav")
+         67 (sample "resources/makes_us.wav")})
 
 (comment
   (midi-connected-devices)
 
   (on-event [:midi :note-on]
     (fn [{note :note}] (my-lead note))
-    ::midi-player)
-  (remove-event-handler ::midi-player)
-
-  (on-event [:midi :note-on]
-    (fn [{note :note}] (play-chord (chord (find-note-name note) :7sus4) my-lead))
     ::midi-player)
   (remove-event-handler ::midi-player)
 
@@ -34,7 +38,12 @@
   (on-event [:midi :note-on]
     (fn [{n :note}] (apply (get drums n) []))
     ::midi-player)
-  (remove-event-handler ::midi-player))
+  (remove-event-handler ::midi-player)
+
+  (on-event [:midi :note-on]
+    (fn [{n :note}] (apply (get dp n) []))
+    ::midi-player)
+  (remove-event-handler ::midi-player) )
 
 (def synth-controls (atom {}))
 (#_ (swap! synth-controls assoc :cutoff 0.43 :fil-amt 1000 :fil-dec 0.5))
@@ -73,14 +82,26 @@
                      11 {:param :fil-amt :min 0.0 :max 1500}
                       1 {:param :fil-dec :min 0.1 :max 1.5}}))
 
-(def nome (metronome 128))
+(def nome (metronome 111))
+
+(def daft-kick (freesound-sample 177908))
+(def soft-kick (sample "resources/kick.wav"))
+(def fat-kick (sample "resources/fat_kick.aif"))
+    (at (nome (inc beat)) (daft-kick))
+
+(defn kick-player [nome beat]
+  (let [next-beat (+ 1 beat)]
+    (at (nome beat) (fat-kick))
+    (apply-by (nome next-beat) kick-player [nome next-beat])))
 
 (comment
   (untztrument play-bass synth-controls controls)
   (remove-event-handler ::untztrument-note)
   (remove-event-handler ::untztrument-control)
   (let [beat (nome)]
-    (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64))
+    (kick-player nome beat)
+    ;(player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64)
+    )
   (println @synth-controls)
   (stop))
 

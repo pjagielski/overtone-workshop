@@ -2,9 +2,8 @@
   (use [overtone.live]))
 
 ;; samples
-(def kick (freesound-sample 192248))
+(def kick (sample "resources/daft/kick.aif"))
 (def snare (freesound-sample 82583))
-;(def hat (freesound-sample 165027))
 (def hat (sample "resources/tambo.wav"))
 
 (comment
@@ -106,6 +105,5 @@
   (ctl d :wobble 8)
   (ctl d :wobble 2 :note 31)
   (skrillex (dubstep (nome :bpm)) nome)
-  (skrillex (dubstep) nome)
   (stop))
 

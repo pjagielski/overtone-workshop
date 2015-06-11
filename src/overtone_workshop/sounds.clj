@@ -37,20 +37,21 @@
 
 ;; notes
 (note :C4)
-(midi->hz (note :C4))
+(midi->hz (note :c3))
+(midi->hz (note :c4))
 
 ;; synth
 (defsynth my-saw [note 60]
   (let [freq (midicps note)
-        freqs [(- 1 freq) freq (+ 1 freq)]]
+        freqs [(- freq 1) freq (+ 1 freq)]]
       (out 0 (pan2 (mix (saw freqs))))))
 
 (comment
   (def s (my-saw))
   (ctl s :note (note :C3))
   (ctl s :note (note :B#4))
-  (ctl s :note (note :C5))
-  (ctl s :note (note :C2))
+  (ctl s :note (note :A4))
+  (ctl s :note (note :C3))
   (stop))
 
 ;; filters
@@ -71,7 +72,7 @@
 
 (comment
   (demo 3 (wobble (saw [99 100]) 3))
-  (demo 3 (wobble (mix (saw [99 100 101])) 3)))
+  (demo 3 (wobble (mix (saw [99 100])) 3)))
 
 ;; detuning
 (definst multi-osc [note 60 osc2-semi 0 amp 0.3]
@@ -102,7 +103,7 @@
 
 (comment
   (demo 3 (wobble (saw [102 103 104]) 3))
-  (demo 3 (wobble (saw [99 103 107]) 3)))
+  (demo 3 (wobble (saw [100 103 106]) 3)))
 
 ;; envelope
 ;;
@@ -110,20 +111,9 @@
 ;; /     \
 ;; A D S R
 
-(definst my-saw [note 60]
-  (pan2 (saw (midicps note))))
-
-(comment
-  (my-saw)
-  (stop))
-
-;;  /---\
-;; /     \
-;; A  S  R
-
 (definst my-env-synth [note 60 attack 0.01 sustain 0.4 release 0.1]
-  (* (env-gen (env-lin attack sustain release))
-     (sin-osc (midicps note))))
+ pulse  (* (env-gen (env-lin attack sustain release))
+     (saw (* 0.5 (midicps note)))))
 
 (comment
   (my-env-synth)
@@ -137,23 +127,28 @@
 
 (comment
   (play-chord (chord :C4 :major) my-env-synth)
-  (play-chord (chord :G3 :major) my-env-synth)
-  (play-chord (chord :F3 :sus4) my-env-synth)
-  (play-chord (chord :C4 :major) (partial my-env-synth :sustain 1.0))
-  (play-chord (map note [:G#5 :C#5 :F4]) my-env-synth))
+  (play-chord (chord :F4 :major) my-env-synth)
+  (play-chord (chord :A3 :major) my-env-synth)
+  (play-chord (chord :G3 :major) (partial my-env-synth :sustain 1.0)))
 
-(definst my-lead [note 60 attack 0.01 sustain 0.4 release 0.2 amp 0.4]
-  (let [freqs [(midicps note) (midicps (+ note 0.08))]]
-    (* amp (env-gen (env-lin attack sustain release))
-       (saw freqs))))
+(defn detune [saws detune]
+  (map-indexed
+    (fn [i v] (+ (- detune) (* i 2 (/ detune (- saws 1)))))
+    (repeat saws detune)))
+
+(detune 3 0.2)
+
+(definst my-lead [note 60 semi 0 attack 0.001 sustain 0.5 release 0.2 amp 0.4 delay 0.45 saws 3 det 0.2]
+  (let [note  (+ note semi)
+        freqs (map #(midicps (+ note %)) (detune 3 0.2))
+        src   (pan2 (mix (saw freqs)))]
+    (* amp src
+       (env-gen (env-lin attack sustain release)))))
 
 (comment
+  (my-lead :note 48)
   (play-chord (chord :C4 :major) my-lead)
-  (play-chord (chord :G3 :major) my-lead)
-  (play-chord (chord :F3 :sus4) my-lead)
-  (play-chord (chord :C4 :7sus4) my-lead)
-  (play-chord (chord :C4 :m13) my-lead)
-  (play-chord (chord :C3 :m11) my-lead)
-  (play-chord (map note [:G#5 :C#5 :F4]) my-lead)
-  (play-chord (map note [:B6 :G6 :B5 :G5 :B4]) my-lead))
+  (play-chord (chord :F4 :major) my-lead)
+  (play-chord (chord :A3 :minor) my-lead)
+  (play-chord (chord :G3 :major) my-lead))
 

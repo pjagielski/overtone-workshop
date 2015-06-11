@@ -34,7 +34,7 @@
                   (+ (nth delrd 2) (nth delrd 3)) (- (nth delrd 2) (nth delrd 3))]
         sig      [(+ (nth sig 0) (nth sig 2)) (+ (nth sig 1) (nth sig 3))
                   (- (nth sig 0) (nth sig 2)) (- (nth sig 0) (nth sig 2))]
-        sig      (* sig [0.4 0.37 0.333 0.3])
+        sig      (* sig [0.4])
         deltimes (- (* [101 143 165 177] 0.001) (control-dur))
         lout     (local-out (delay-c sig deltimes deltimes))
         ]
@@ -42,6 +42,6 @@
 
 (comment
   (schroeder-reverb-countdown :rate 0.8)
-  (schroeder-reverb-countdown :rate 0.99)
+  (schroeder-reverb-countdown :rate 2)
   (stop))
 
