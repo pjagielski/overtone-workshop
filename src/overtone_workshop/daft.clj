@@ -24,6 +24,7 @@
 (on-event [:midi :note-on]
     (fn [{n :note}] (apply (get dp n) []))
     ::midi-player)
+(remove-event-handler ::midi-player)
 
 (def around1 (sample "resources/daft/around1.wav"))
 (def around2 (sample "resources/daft/around2.wav"))
@@ -105,10 +106,10 @@
                       11 {:param :filt :min 1 :max 24}
                        1 {:param :coef :min 0.1 :max 1.0}}))
 
-(defn untztrument [synth-controls]
+(defn untztrument [synth-controls controls]
   (on-event [:midi :control-change]
             (fn [{value :velocity note :note}]
-              (when-let [control (get @*controls note)]
+              (when-let [control (get @controls note)]
                 (let [normalized-value (/ (- value 1) 127)
                       scaled-value (+ (:min control) (* normalized-value (- (:max control) (:min control))))]
                   (swap! synth-controls assoc (:param control) scaled-value))))
@@ -117,7 +118,7 @@
 (comment
   (play-all)
   (reset! *vocals vocals)
-  (untztrument *arp)
+  (untztrument *arp *controls)
   (remove-event-handler ::untztrument-control)
   (swap! *beats assoc open-hat #{1/2 3/2 5/2 7/2})
   (swap! *vocals clear-vals)
@@ -127,7 +128,7 @@
     (swap! *vocals clear-vals))
   (reset! *beats beats)
   (swap! *bass assoc :amp 0.6)
-  (swap! *arp assoc :amp 0.0)
+  (swap! *arp assoc :amp 0.5)
   (swap! *arp assoc :amp 0.5 :filt 24 :decay 0.9 :coef 0.1)
   (dosync
     (swap! *vocals assoc s-lucky-robot1 #{1/2 9/2 17/2} s-lucky-robot2 #{})

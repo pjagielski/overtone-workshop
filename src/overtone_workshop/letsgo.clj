@@ -20,7 +20,8 @@
 
 (comment (lead :note 70))
 (def brvb (inst-fx! lead fx-freeverb))
-(ctl brvb :room-size 0.8 :wet-dry 0.5 :dampening 0.25)
+(ctl brvb :room-size 0.45 :wet-dry 0.35 :dampening 0.25)
+(clear-fx lead)
 
 (definst bass [note 60 amp 0.5 osc-mix 0.2 cutoff 0.35 sustain 0.2 release 0.15 fil-dec 0.85 fil-amt 1500]
   (let [freq (midicps note)
@@ -61,11 +62,6 @@
     (at (nome (+ 1 beat)) (do (kick) (clap)))
     (at (nome (+ 1.5 beat)) (tambo))
     (apply-by (nome next-beat) beat-player [nome next-beat])))
-
-(defn play-bass [step-ctl]
-  (if-let [sustain (get step-ctl :sustain)]
-    (partial bass :sustain sustain)
-    (partial bass)))
 
 (defn play-all [nome]
   (let [beat (nome)]

@@ -114,3 +114,6 @@
 
 (def dafunk-ctrls
   {0 {:sustain 0.7} 14 {:sustain 0.8} 30 {:sustain 0.8} 46 {:sustain 0.8} 56 {:sustain 0.4} 60 {:sustain 0.4}})
+
+(def danse
+  {0 [:C4] 3 [:F4] 6 [:C5] 10 [:C5] 14 [:C5] 16 [:G#4] 19 [:C#5] 22 [:G4] 26 [:G4] 30 [:G4]})
