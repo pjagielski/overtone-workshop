@@ -1,5 +1,6 @@
 (ns overtone-workshop.midi
-  (:use [overtone.live])
+  (:use [overtone.live]
+        [overtone.inst.sampled-piano])
   (:require [overtone-workshop.player :refer :all]
             [overtone-workshop.sounds :refer [my-lead play-chord]]
             [overtone-workshop.patterns :refer :all]
@@ -30,7 +31,6 @@
 
 (comment
   (def x (tone :gate 1))
-
   (def controls {13 {:control :nharm  :min 12  :max 40}
                  11 {:control :freq   :min 40  :max 440}
                   1 {:control :detune :min 0.1 :max 20}})
@@ -42,7 +42,6 @@
     ::midi-player)
   (remove-event-handler ::midi-player)
   (ctl x :gate 0))
-
 
 (comment
   (midi-connected-devices)
@@ -76,7 +75,7 @@
 
 (def synth-controls (atom {}))
 (#_ (swap! synth-controls assoc :cutoff 0.43 :fil-amt 1000 :fil-dec 0.5))
-(swap! synth-controls assoc :cutoff 0.53 :fil-amt 0 :fil-dec 0)
+(swap! synth-controls assoc :cutoff 0.01 :fil-amt 3500 :fil-dec 1.5)
 
 (comment
   (bass)
@@ -103,8 +102,6 @@
                       11 {:param :fil-amt :min 0.0 :max 4500}
                        1 {:param :fil-dec :min 0.1 :max 1.5}}))
 
-(def nome (metronome 111))
-
 (def daft-kick (freesound-sample 177908))
 (def clap (freesound-sample 196250))
 (def fat-kick (sample "resources/fat_kick.aif"))
@@ -112,7 +109,7 @@
 (defn kick-player [nome beat]
   (let [next-beat (+ 2 beat)]
     (at (nome beat) (fat-kick) (daft-kick))
-    (at (nome (+ 1 beat)) (clap) (daft-kick))
+    (at (nome (+ 1 beat)) (fat-kick) (clap) (daft-kick))
     (apply-by (nome next-beat) kick-player [nome next-beat])))
 
 (defn play-bass []
@@ -122,12 +119,6 @@
   (untztrument (play-bass) synth-controls *controls)
   (remove-event-handler ::untztrument-note)
   (remove-event-handler ::untztrument-control)
-  (let [beat (nome)]
-    (player danse {} nome beat (play-bass) 8 32))
-  (let [beat (nome)]
-    (kick-player nome beat)
-    (player danse {} nome beat (play-bass) 8 32)
-    (player letsgo-bass letsgo-bass-ctrl nome beat play-bass 16 64))
-  (println @synth-controls)
+  (let [nome (metronome 128) beat (nome)]
+    (player letsgo-bass {} nome beat (play-bass) 16 64))
   (stop))
-

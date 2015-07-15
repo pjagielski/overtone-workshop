@@ -87,19 +87,3 @@
     (ddd1 g (+ time 4250))
     (ddd1 g (+ time 5350))
     (ddd2 g (+ time 6450))))
-
-(defn play1 [metro k N chord-list]
-   (dotimes [n N]
-     (doseq [[i cur-chord] (map-indexed vector chord-list)]
-       (let [cur-dir (choose [:up :down])
-             cur-pattern (choose ["d-du-ud-"
-                                  "d-du-udu"
-                                  "d-d--udu"])]
-         (strum-pattern g metro (+ k (* 4 n) i) cur-chord cur-pattern)))))
-(comment
- (let [metro (metronome 132)]
-   (play1 metro 0 1 [:C :G :Am :F])
-   (play1 metro 4 1 [:Am :F :C :G])
-   (play1 metro 8 1 [:C :G :Am :F])
-   (play1 metro 12 1 [:C :G :Em :C])))
-

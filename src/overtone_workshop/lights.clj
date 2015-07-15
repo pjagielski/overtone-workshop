@@ -7,25 +7,15 @@
   (let [freq (midicps note)
         osc1 (saw freq)
         snd  (mix [osc1])
-        snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
-        env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
-    (pan2 (* snd env amp))))
+      snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
+      env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
+  (pan2 (* snd env amp))))
 
 (definst bass [note 60 fine 0.12 cutoff 0.62 amp 1.2 sustain 0.4 release 0.15]
   (let [freq (midicps note)
         osc1 (saw freq)
         osc2 (saw (midicps (+ note fine)))
         snd  (mix [osc1 osc2])
-        snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
-        env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
-    (pan2 (* snd env amp))))
-
-(definst bass [note 60 fine 0.12 cutoff 0.62 sub-amp 0.5 amp 1.0 sustain 0.4 release 0.15]
-  (let [freq (midicps note)
-        osc1 (saw freq)
-        osc2 (saw (midicps (+ note fine)))
-        sub  (* sub-amp (pulse (/ freq 2)))
-        snd  (mix [osc1 osc2 sub])
         snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
         env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
     (pan2 (* snd env amp))))
@@ -105,61 +95,21 @@
 (def *beats (atom patterns))
 
 (def *strings (atom {:amp 0}))
-(defn play-strings []
-  (partial play-with-controls #'strings *strings))
+(def play-strings (partial play-with-controls #'strings *strings))
 
 (def *bouncy (atom {:amp 0}))
-(defn play-bouncy []
-  (partial play-with-controls #'bouncy *bouncy))
-
-(defsynth funk [note 60 divisor 2.0 depth 1.0 sustain 0.2 contour 0.15 cutoff 0.4 amp 0.5]
-  (let [carrier   (midicps note)
-        modulator (/ carrier divisor)
-        freq      (midicps (+ note 0.12))
-        mod-env   (env-gen (lin 0.1 sustain 0.2))
-        amp-env   (env-gen (env-lin 0.01 sustain 0.2) :action FREE)
-        fil-env   (env-gen (adsr 0.1 0.75 0.1 0.2))
-        osc1      (* 0.5 (saw (/ freq 2)))
-        osc2      (saw modulator)
-        mod-osc2  (sin-osc (+ carrier
-                              (* mod-env (* carrier depth) osc2)))
-        snd       (+ mod-osc2 osc1)
-        snd       (rlpf snd (+ (* fil-env (* contour 10000))
-                               (lin-exp cutoff 0.0 1.0 20.0 20000.0)) 0.25)]
-    (out 0 (pan2 (* amp amp-env snd)))))
-
-(def *funk (atom {:divisor 4 :depth 1.5}))
-(defn play-funk []
-  (partial play-with-controls #'funk *funk))
-
-(def *controls (atom {13 {:param :amp :min 0 :max 1.0}
-                      11 {:param :divisor :min 2 :max 24}
-                       1 {:param :depth :min 0.1 :max 2.0}}))
-
-(defn untztrument [synth-controls]
-  (on-event [:midi :control-change]
-            (fn [{value :velocity note :note}]
-              (when-let [control (get @*controls note)]
-                (let [normalized-value (/ (- value 1) 127)
-                      scaled-value (+ (:min control) (* normalized-value (- (:max control) (:min control))))]
-                  (swap! synth-controls assoc (:param control) scaled-value))))
-               ::untztrument-control))
-
+(def play-bouncy (partial play-with-controls #'bouncy *bouncy))
 
 (defn play-all []
   (let [nome (metronome 120) beat (nome)]
     (sequencer nome beat *beats 1/8 16)
-    #_(player dafunk dafunk-ctrls nome beat (play-funk) 16 64)
-    (player lights-strings lights-bass-control nome beat (play-strings) 16 64)
-    (player lights {} nome beat (play-bouncy) 16 64)
+    (player lights-strings lights-bass-control nome beat play-strings 16 64)
+    (player lights {} nome beat play-bouncy 16 64)
     (player lights-bass lights-bass-control nome beat #'bass 16 64)))
 
 (swap! *beats clear-vals)
 
 (comment
-  (let [nome (metronome 120) beat (nome)] (player dafunk dafunk-ctrls nome beat (play-funk) 16 64))
-  (untztrument *funk)
-  (remove-event-handler ::untztrument-control)
   (play-all)
   (reset! *beats patterns)
   (swap! *bass assoc :amp 0.0)

@@ -30,9 +30,7 @@
 (comment
   (demo 2 (saw [200 200]))
   (demo 2 (saw [199 200]))
-  (demo 2 (saw [199 200 201]))
   (demo 2 (pan2 (mix (saw [199 200]))))
-  (demo 2 (pan2 (mix (pulse [199 200]))))
   (demo 2 (pan2 (mix (saw [99 100 101])))))
 
 ;; notes
@@ -112,8 +110,8 @@
 ;; A D S R
 
 (definst my-env-synth [note 60 attack 0.01 sustain 0.4 release 0.1]
- pulse  (* (env-gen (env-lin attack sustain release))
-     (saw (* 0.5 (midicps note)))))
+ (* (env-gen (env-lin attack sustain release))
+     (sin-osc (* 0.5 (midicps note)))))
 
 (comment
   (my-env-synth)

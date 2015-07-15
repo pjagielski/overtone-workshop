@@ -20,8 +20,7 @@
 
 (comment (lead :note 70))
 (def brvb (inst-fx! lead fx-freeverb))
-(ctl brvb :room-size 0.45 :wet-dry 0.35 :dampening 0.25)
-(clear-fx lead)
+(comment (ctl brvb :room-size 0.45 :wet-dry 0.35 :dampening 0.25))
 
 (definst bass [note 60 amp 0.5 osc-mix 0.2 cutoff 0.35 sustain 0.2 release 0.15 fil-dec 0.85 fil-amt 1500]
   (let [freq (midicps note)

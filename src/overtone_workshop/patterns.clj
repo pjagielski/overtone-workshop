@@ -109,7 +109,7 @@
   {48 {:sustain 0.05} 50 {:sustain 0.05} 52 {:sustain 0.05} 54 shrt 56 shrt 58 shrt 60 {:sustain 0.3}})
 
 (def dafunk
-  {0 [:G4] 8 [:F4] 10 [:G4] 12 [:A#4] 14 [:D4] 24 [:C4] 26 [:D4] 28 [:F4] 30 [:A#3] 
+  {0 [:G4] 8 [:F4] 10 [:G4] 12 [:A#4] 14 [:D4] 24 [:C4] 26 [:D4] 28 [:F4] 30 [:A#3]
    40 [:A3] 42 [:A#3] 44 [:D4] 46 [:G3] 56 [:A3] 60 [:A#3]})
 
 (def dafunk-ctrls
@@ -117,3 +117,21 @@
 
 (def danse
   {0 [:C4] 3 [:F4] 6 [:C5] 10 [:C5] 14 [:C5] 16 [:G#4] 19 [:C#5] 22 [:G4] 26 [:G4] 30 [:G4]})
+
+(def follow-chorus
+  (merge
+    (zipmap [0  4  8  11 14] (repeat 5 [:F3 :F4 :C5 :A4]))
+    (zipmap [16 20 24 27 30] (repeat 5 [:G3 :G4 :B4 :D5]))
+    (zipmap [32 36 40 43 46] (repeat 5 [:A3 :A4 :C5 :E5]))
+    (zipmap [48 52 56 59 62] (repeat 5 [:G3 :G4 :B4 :E5]))))
+
+(def follow
+  (merge
+    (zipmap [0  4  10 14] (repeat 5 [:F3 :F4 :C5 :A4]))
+    (zipmap [16 20 26 30] (repeat 5 [:G3 :G4 :B4 :D5]))
+    (zipmap [32 36 42 46] (repeat 5 [:A3 :A4 :C5 :E5]))
+    (zipmap [48 52 58 62] (repeat 5 [:G3 :G4 :B4 :E5]))))
+
+(def doit
+  {0 [:C3] 1 [:C3] 2 [:A4] 4 [:A4] 6 [:A3] 7 [:A3] 8 [:A4]})
+

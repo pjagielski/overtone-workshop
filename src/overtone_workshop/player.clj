@@ -30,7 +30,3 @@
   (let [next-beat (+ scale beat)]
     (apply-by (nome next-beat) sequencer [nome next-beat live-patterns scale beats])))
 
-(defn simple-player [{:keys [:pattern :pattern-ctrl :nome :beat :synth-fn :beats :resolution]
-                      :or {:beats 16 :resolution 64 :pattern-ctrl {}}}]
-  (player pattern pattern-ctrl nome beat synth-fn beats resolution))
-
