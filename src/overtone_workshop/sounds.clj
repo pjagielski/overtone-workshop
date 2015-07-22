@@ -1,5 +1,6 @@
 (ns overtone-workshop.sounds
-  (use [overtone.live])
+  (use [overtone.live]
+       [overtone.studio.scope])
   (require [overtone.inst.synth :refer [supersaw]]))
 
 ;;   ╭-╮
@@ -11,6 +12,7 @@
 
 ;; signals (oscilators)
 (comment
+  (scope 0)
   (demo 2 (sin-osc))
   (demo 2 (saw))
   (demo 2 (pulse))
@@ -70,7 +72,7 @@
 
 (comment
   (demo 3 (wobble (saw [99 100]) 3))
-  (demo 3 (wobble (mix (saw [99 100])) 3)))
+  (demo 3 (wobble (mix (saw [99 100 101])) 3)))
 
 ;; detuning
 (definst multi-osc [note 60 osc2-semi 0 amp 0.3]
@@ -81,8 +83,7 @@
         snd   (+ osc1 osc2)]
     (pan2 (* amp snd))))
 
-(note :C4)
-(note :C5)
+(- (note :C5) (note :C4))
 
 (comment
   (def m (multi-osc))
@@ -95,12 +96,8 @@
   (ctl m :osc2-semi 0.80)
   (stop))
 
-(midi->hz 44)
-(midi->hz 44.16)
-(note :G#2)
-
 (comment
-  (demo 3 (wobble (saw [102 103 104]) 3))
+  (demo 3 (wobble (saw [101 103 104]) 3))
   (demo 3 (wobble (saw [100 103 106]) 3)))
 
 ;; envelope
@@ -131,7 +128,7 @@
 
 (defn detune [saws detune]
   (map-indexed
-    (fn [i v] (+ (- detune) (* i 2 (/ detune (- saws 1)))))
+    (fn [i _] (+ (- detune) (* i 2 (/ detune (- saws 1)))))
     (repeat saws detune)))
 
 (detune 3 0.2)

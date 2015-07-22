@@ -1,6 +1,6 @@
 (ns overtone-workshop.timing
   (:use [overtone.live]
-        [overtone.inst.sampled-piano])
+        [overtone.samples.piano :only [index-buffer]])
   (:require [overtone-workshop.player :refer :all]
             [overtone-workshop.patterns :refer :all]))
 
@@ -93,24 +93,63 @@
     (at (nome (+ 6 beat)) (ctl d :wobble 6 :note 45))
     (apply-by (nome (+ 8 beat)) skrillex [d nome])))
 
-(def h_kick (sample "resources/house/kick.wav"))
-(def h_clap (sample "resources/house/clap.wav"))
-(def h_snare (sample "resources/house/snare.wav"))
-(def h_hat (sample "resources/daft/close_hat.aif"))
-
-(def h_pats {h_kick  #{0 1 2 3}
-             h_snare #{1 3}
-             h_clap  #{1 3}
-             h_hat   #{0 1/2 1 3/2 2 5/2 3 7/2}})
 (comment
   (def d (dubstep 120))
   (ctl d :wobble 4)
   (ctl d :wobble 8)
   (ctl d :wobble 2 :note 31)
-  (let [nome (metronome 120) beat (nome)]
+  (let [nome (metronome 120)]
     (skrillex (dubstep (nome :bpm)) nome))
-  (let [nome (metronome 128) beat (nome)]
-    (sequencer nome beat (atom h_pats) 1/2 4)
-    (player follow {} nome beat sampled-piano 16 64))
+  (stop))
+
+(def h_kick (sample "resources/house/kick.wav"))
+(def f_kick (sample "resources/house/fat_bd.wav"))
+(def h_clap (sample "resources/house/clap.wav"))
+(def h_snare (sample "resources/house/snare.wav"))
+(def h_hat (sample "resources/daft/close_hat.aif"))
+
+(def h_pats {h_kick  #{0 1 2 3 4 5 6 7}
+             h_snare #{1 3 5 7}
+             h_clap  #{1 3 5 7}
+             h_hat   (into #{} (concat (range 0 8 1/2)
+                                       (shift-patt 0 [3/4 7/4 5/4])
+                                       (shift-patt 4 [3/4 7/4 5/4])))})
+
+(def *pats (atom h_pats))
+
+(definst sampled-piano
+  [note 60 level 1 rate 1 loop? 0 pos 0 attack 0 decay 1 sustain 1 release 0.1 curve -4 gate 1]
+  (let [buf (index:kr (:id index-buffer) note)
+        env (env-gen (adsr attack decay sustain release level curve) :gate gate :action FREE)]
+    (* env (scaled-play-buf 2 buf :start-pos pos :rate rate :level level :loop loop? :action FREE))))
+
+(definst bass [note 60 amp 0.5 osc-mix 0.2 cutoff 0.35 sustain 0.25 release 0.25 fil-dec 0.25 fil-amt 1000]
+  (let [note (- note 12)
+        freq (midicps note)
+        sub-freq (midicps (- note 12))
+        osc1 (saw:ar freq)
+        osc2 (pulse sub-freq 0.5)
+        osc (+ (* osc-mix osc2) (* (- 1 osc-mix) osc1))
+        snd [osc osc]
+        fil-env (env-gen (adsr 0.0 fil-dec 0.1 fil-dec))
+        snd (lpf snd (+ (* fil-env fil-amt) (lin-exp cutoff 0.0 1.0 20.0 20000.0)))
+        env (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
+    (out 0 (* amp env snd))))
+
+(def my-piano
+  (partial sampled-piano :level 0.4 :pos 1500 :decay 0.1))
+
+(comment
+  (swap! *pats assoc h_snare #{1 3 5 25/4 7})
+  (reset! *pats h_pats)
+  (reset! *pats {})
+  (swap! *pats assoc h_snare #{1 3 5 7})
+  (swap! *pats assoc h_clap #{1 3 5 7})
+  (swap! *pats assoc h_kick #{0 2 5/4 4 6 7 15/2})
+  (swap! *pats assoc h_hat #{0 1/2 3/4 1 5/4 7/4 4 5 6 7})
+  (let [nome (metronome 122) beat (nome)]
+    (sequencer nome beat *pats 1/4 8)
+    (player follow {} nome beat #'my-piano 16 64)
+    (player follow-bass {} nome beat #'bass 16 64))
   (stop))
 
