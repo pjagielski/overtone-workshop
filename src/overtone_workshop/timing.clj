@@ -5,7 +5,7 @@
             [overtone-workshop.patterns :refer :all]))
 
 ;; samples
-(def kick (sample "resources/daft/kick.aif"))
+(def kick (sample "resources/house/kick.wav"))
 (def snare (freesound-sample 82583))
 (def hat (sample "resources/tambo.wav"))
 
@@ -90,7 +90,8 @@
   (let [beat (nome)]
     (at (nome) (ctl d :wobble 1.5 :note 29))
     (at (nome (+ 2 beat)) (ctl d :wobble 4 :note 40))
-    (at (nome (+ 6 beat)) (ctl d :wobble 6 :note 45))
+    (at (nome (+ 4 beat)) (ctl d :wobble 6 :note 45))
+    (at (nome (+ 5 1/2 beat)) (ctl d :wobble 4 :note 48))
     (apply-by (nome (+ 8 beat)) skrillex [d nome])))
 
 (comment
@@ -107,6 +108,7 @@
 (def h_clap (sample "resources/house/clap.wav"))
 (def h_snare (sample "resources/house/snare.wav"))
 (def h_hat (sample "resources/daft/close_hat.aif"))
+(def h_ohat (sample "resources/daft/open_hat.aif"))
 
 (def h_pats {h_kick  #{0 1 2 3 4 5 6 7}
              h_snare #{1 3 5 7}
@@ -118,12 +120,14 @@
 (def *pats (atom h_pats))
 
 (definst sampled-piano
-  [note 60 level 1 rate 1 loop? 0 pos 0 attack 0 decay 1 sustain 1 release 0.1 curve -4 gate 1]
+  [note 60 level 1 rate 1 loop? 0 pos 0 attack 0 decay 1 sustain 1 release 0.1 curve -4 gate 1 cutoff 0.5]
   (let [buf (index:kr (:id index-buffer) note)
-        env (env-gen (adsr attack decay sustain release level curve) :gate gate :action FREE)]
-    (* env (scaled-play-buf 2 buf :start-pos pos :rate rate :level level :loop loop? :action FREE))))
+        env (env-gen (adsr attack decay sustain release level curve) :gate gate :action FREE)
+        snd (scaled-play-buf 2 buf :start-pos pos :rate rate :level level :loop loop? :action FREE)
+        flt (hpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0))]
+    (* env flt)))
 
-(definst bass [note 60 amp 0.5 osc-mix 0.2 cutoff 0.35 sustain 0.25 release 0.25 fil-dec 0.25 fil-amt 1000]
+(definst bass [note 60 amp 0.7 osc-mix 0.6 cutoff 0.4 sustain 0.15 release 0.25 fil-dec 0.15 fil-amt 1250]
   (let [note (- note 12)
         freq (midicps note)
         sub-freq (midicps (- note 12))
@@ -137,16 +141,21 @@
     (out 0 (* amp env snd))))
 
 (def my-piano
-  (partial sampled-piano :level 0.4 :pos 1500 :decay 0.1))
+  (partial sampled-piano :level 1.0 :pos 2500 :decay 0.01 :cutoff 0.65))
 
 (comment
-  (swap! *pats assoc h_snare #{1 3 5 25/4 7})
+  (sampled-piano :note (note :C4))
+  (sampled-piano :note (note :A4))
+  (sampled-piano :cutoff 0.6)
   (reset! *pats h_pats)
   (reset! *pats {})
+  (swap! *pats assoc h_snare #{1 3 5 25/4 7})
   (swap! *pats assoc h_snare #{1 3 5 7})
   (swap! *pats assoc h_clap #{1 3 5 7})
-  (swap! *pats assoc h_kick #{0 2 5/4 4 6 7 15/2})
-  (swap! *pats assoc h_hat #{0 1/2 3/4 1 5/4 7/4 4 5 6 7})
+  (swap! *pats assoc h_kick #{0 2 5/4 4 6 15/2})
+  (swap! *pats assoc h_hat (into #{} (range 0 8 1/2)))
+  (swap! *pats assoc h_kick #{0 4})
+  (swap! *pats assoc h_ohat #{11/4 7/2 (+ 4 11/4) (+ 4 7/2)})
   (let [nome (metronome 122) beat (nome)]
     (sequencer nome beat *pats 1/4 8)
     (player follow {} nome beat #'my-piano 16 64)

@@ -20,6 +20,8 @@
              54 [:G7 :E7 :G6 :E6 :B5 :E5]
              57 [:G7 :E7 :G6 :E6 :B5 :E5]})
 
+(zipmap [0 3 6 9] (repeat 4 [:B6 :G6 :B5 :G5 :B4]))
+
 (def letsgo-bass
   {0  [:E2] 3  [:E2] 6  [:E2] 9  [:E2] 11 [:E3] 12 [:E2] 14 [:E3]
    16 [:G2] 19 [:G2] 22 [:G2] 25 [:G2] 27 [:G2] 30 [:G2]
@@ -133,10 +135,10 @@
 
 (def follow-bass
   (merge
-    (zipmap [0  4  10 14] (repeat 5 [:F3]))
-    (zipmap [16 20 26 30] (repeat 5 [:G3]))
-    (zipmap [32 36 46] (repeat 5 [:A3]))
-    (zipmap [48 52 58 62] (repeat 5 [:G3]))))
+    (zipmap [0  4  8  11 14] (repeat 5 [:F3]))
+    (zipmap [16 20 24 27 30] (repeat 5 [:G3]))
+    (zipmap [32 36 40 43 46] (repeat 5 [:A3]))
+    (zipmap [48 52 56 59 62] (repeat 5 [:G3]))))
 
 (def follow
   (merge
@@ -145,6 +147,54 @@
     (zipmap [32 36 42 46] (repeat 5 [:A3 :A4 :C5 :E5]))
     (zipmap [48 52 58 62] (repeat 5 [:G3 :G4 :B4 :E5]))))
 
-(def doit
-  {0 [:C3] 1 [:C3] 2 [:A4] 4 [:A4] 6 [:A3] 7 [:A3] 8 [:A4]})
+(defn transpose [updown notes]
+  (map (fn [n] (find-note-name (+ updown (note n)))) notes))
+
+(def repetition-sub-a [:C5, :A3, :B4, :A3, :C5, :E5, :A3, :A4, :C5, :A3, :B4, :A3, :C5, :A4])
+(def repetition-a (concat [:A4, :A3] repetition-sub-a [:A3, :A4] repetition-sub-a))
+
+(def repetition-b [:F4, :F4, :A4, :F4, :G4, :F4, :A4, :C5, :F4, :F4, :A4, :F4, :G4, :F4, :A4, :F4])
+
+;; slight variation of the above with different distances between the 2nd and 3rd note
+(def repetition-b3 [:E4, :E4, :G4, :E4, :F#3, :E4, :G4, :B4, :E4, :E4, :G4, :E4, :F#3, :E4, :G4, :E4])
+
+(def theme  (concat
+              repetition-a
+              (transpose -5 repetition-a)
+              repetition-a
+              (transpose -5 repetition-a)
+              repetition-b
+              (transpose 2 repetition-b)
+              (transpose -2 repetition-b3)
+              repetition-b3
+              repetition-b
+              (transpose 2 repetition-b)
+              repetition-b3
+              repetition-b3))
+
+(def score (concat
+            (concat (drop-last theme) [(note :A4)])
+            theme
+            (concat (drop-last theme) [(note :A4)])
+            (concat (drop-last theme) [(note :A4)])))
+
+(def giorgio
+  (->>
+    score
+    (zipmap (range (count score)))
+    (map (fn [[k v]] {k [v]}))
+    (into {})))
+
+(def within
+  (let [patt [0 2 3 5 6 9 10 12 13 14]]
+    (merge
+      (zipmap (shift-patt 0 patt) (repeat 14 [:A#2]))
+      {14 [:G#2] 15 [:G#2]}
+      (zipmap (shift-patt 16 patt) (repeat 14 [:F#2]))
+      {30 [:F2] 31 [:F2]}
+      (zipmap (range 32 46) (repeat 14 [:D#2]))
+      {46 [:F2] 47 [:F2]}
+      (zipmap (range 48 58) (repeat 14 [:G#2]))
+      (zipmap (range 58 64) (repeat 10 [:F2])))))
+
 
