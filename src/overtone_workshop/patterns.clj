@@ -158,7 +158,7 @@
 ;; slight variation of the above with different distances between the 2nd and 3rd note
 (def repetition-b3 [:E4, :E4, :G4, :E4, :F#3, :E4, :G4, :B4, :E4, :E4, :G4, :E4, :F#3, :E4, :G4, :E4])
 
-(def theme  (concat
+(def theme (concat
               repetition-a
               (transpose -5 repetition-a)
               repetition-a
@@ -172,15 +172,19 @@
               repetition-b3
               repetition-b3))
 
+(def short-theme
+  (concat repetition-a
+          (transpose -5 repetition-a)))
+
 (def score (concat
-            (concat (drop-last theme) [(note :A4)])
-            theme
-            (concat (drop-last theme) [(note :A4)])
-            (concat (drop-last theme) [(note :A4)])))
+             (concat (drop-last theme) [(note :A4)])
+             theme
+             (concat (drop-last theme) [(note :A4)])
+             (concat (drop-last theme) [(note :A4)])))
 
 (def giorgio
   (->>
-    score
+    short-theme
     (zipmap (range (count score)))
     (map (fn [[k v]] {k [v]}))
     (into {})))

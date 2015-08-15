@@ -2,12 +2,27 @@
   (:use [overtone.live]
         [overtone.samples.piano :only [index-buffer]])
   (:require [overtone-workshop.player :refer :all]
-            [overtone-workshop.patterns :refer :all]))
+            [overtone-workshop.patterns :refer :all]
+            [overtone-workshop.sampler :refer :all]))
 
 ;; samples
-(def kick (sample "resources/house/kick.wav"))
-(def snare (freesound-sample 82583))
+(def kick (sample "resources/kick2.wav"))
+(def snare (sample "resources/sd.wav"))
+(def sd (sample "resources/m_sd.wav"))
+(def sdl (sample "resources/sdl.wav"))
 (def hat (sample "resources/tambo.wav"))
+(def hihat (sample "resources/hihat.wav"))
+(def ohh (sample "resources/openhh.wav"))
+(def clap (sample "resources/clap.wav"))
+(def congall (sample "resources/congall.wav"))
+(def daften (sample "resources/daft/dafunk.aif"))
+
+(def h_kick (sample "resources/house/kick.wav"))
+(def f_kick (sample "resources/house/fat_bd.wav"))
+(def h_clap (sample "resources/house/clap.wav"))
+(def h_snare (sample "resources/house/snare.wav"))
+(def h_hat (sample "resources/daft/close_hat.aif"))
+(def h_ohat (sample "resources/daft/open_hat.aif"))
 
 (comment
   (kick)
@@ -26,13 +41,13 @@
     (at (+ 1000 t) (kick))))
 
 ;; temporal recursion
-(defn beats []
+(defn loop-fn []
   (let [t (now) next (+ 1000 t)]
     (at t (kick))
-    (apply-by next beats [])))
+    (apply-by next loop-fn [])))
 
 (comment
-  (beats)
+  (loop-fn)
   (stop))
 
 ;; metronome
@@ -40,24 +55,25 @@
 (nome)
 (nome 3)
 
-(defn beat-player [nome beat]
+(defn loop-player [nome beat]
   (let [next-beat (inc beat)]
     (at (nome beat) (kick))
-    (apply-by (nome next-beat) beat-player [nome next-beat])))
+    (apply-by (nome next-beat) loop-player [nome next-beat])))
 
 (comment
-  (beat-player nome (nome))
+  (loop-player nome (nome))
   (nome :bpm 160)
   (nome :bpm 240)
   (nome :bpm 540)
   (stop))
 
 (def _ 0)
-(def pats {kick  [1 _ _ _ 1 _ _ _]
-           snare [_ _ 1 _ _ _ 1 _]
-           hat   [_ _ _ _ _ _ _ _]})
+(def beats {kick [1 _ _ _ 1 _ _ _]
+            sd   [_ _ 1 _ _ _ 1 _]
+            clap [_ _ 1 _ _ _ 1 _]
+            hat  [_ _ _ _ _ _ _ _]})
 
-(def live-pats (atom pats))
+(def *beats (atom beats))
 
 (defn live-sequencer [nome beat live-patterns scale idx]
   (doseq [[sound pattern] @live-patterns]
@@ -68,10 +84,45 @@
 
 (comment
   (let [nome (metronome 128)]
-    (live-sequencer nome (nome) live-pats 1/2 0))
-  (swap! live-pats assoc kick [1 _ _ 1 _ 1 _ 1])
-  (swap! live-pats assoc hat  [_ 1 _ 1 _ 1 _ 1])
-  (reset! live-pats pats)
+    (live-sequencer nome (nome) *beats 1/2 0))
+  (swap! *beats assoc kick [1 _ _ 1 _ 1 _ 1])
+  (swap! *beats assoc hat  [_ 1 _ 1 _ 1 _ 1])
+  (reset! *beats beats)
+  (stop))
+
+(def voc (partial slicer :in daften :start 0 :end 38000 :amp 1.0 :fade 0.0))
+
+(comment
+  (voc))
+
+(def house-beats
+  {kick   [1 _ _ _ 1 _ _ _ 1 _ _ _ 1 _ _ _ ]
+   sd     [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ 1 ]
+   clap   [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ ]
+   h_hat  [_ _ 1 _ _ _ 1 1 _ _ 1 _ _ _ 1 1 ]
+   hihat  [_ _ _ 1 _ _ _ _ _ 1 _ 1 _ _ _ 1 ]
+   #'voc  [_ _ 1 _ _ _ _ _ _ _ _ _ _ _ _ 1 ]})
+
+(def *house-beats (atom house-beats))
+
+(comment
+  (let [nome (metronome 120) beat (nome)]
+    (live-sequencer nome beat *house-beats 1/4 0))
+  (stop))
+
+(def hip-hop
+  {kick    [1 _ _ _ _ _ _ 1 _ _ 1 _ _ _ _ 1 ]
+   sdl     [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ ]
+   clap    [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ ]
+   hihat   [1 _ 1 _ 1 _ 1 _ 1 _ 1 _ 1 _ _ 1 ]
+   ohh     [_ _ _ _ _ _ _ _ _ _ _ _ _ _ 1 _ ]})
+
+(def *hip-hop (atom hip-hop))
+
+(comment
+  (swap! *hip-hop assoc congall [1 1 _ 1 _ _ _ _ _ _ 1 _ _ _ _ _])
+  (let [nome (metronome 90) beat (nome)]
+    (live-sequencer nome beat *hip-hop 1/4 0))
   (stop))
 
 (defsynth dubstep [bpm 100 wobble 1 note 29 v 1 out-bus 0]
@@ -91,8 +142,7 @@
     (at (nome) (ctl d :wobble 1.5 :note 29))
     (at (nome (+ 2 beat)) (ctl d :wobble 4 :note 40))
     (at (nome (+ 4 beat)) (ctl d :wobble 6 :note 45))
-    (at (nome (+ 5 1/2 beat)) (ctl d :wobble 4 :note 48))
-    (apply-by (nome (+ 8 beat)) skrillex [d nome])))
+    (apply-by (nome (+ 6 beat)) skrillex [d nome])))
 
 (comment
   (def d (dubstep 120))
@@ -103,20 +153,7 @@
     (skrillex (dubstep (nome :bpm)) nome))
   (stop))
 
-(def h_kick (sample "resources/house/kick.wav"))
-(def f_kick (sample "resources/house/fat_bd.wav"))
-(def h_clap (sample "resources/house/clap.wav"))
-(def h_snare (sample "resources/house/snare.wav"))
-(def h_hat (sample "resources/daft/close_hat.aif"))
-(def h_ohat (sample "resources/daft/open_hat.aif"))
-
-(def h_pats {h_kick  #{0 1 2 3 4 5 6 7}
-             h_snare #{1 3 5 7}
-             h_clap  #{1 3 5 7}
-             h_hat   (into #{} (concat (range 0 8 1/2)
-                                       (shift-patt 0 [3/4 7/4 5/4])
-                                       (shift-patt 4 [3/4 7/4 5/4])))})
-
+(def h_pats {h_kick  #{0 1 2 3 4 5 6 7}})
 (def *pats (atom h_pats))
 
 (definst sampled-piano
@@ -127,7 +164,7 @@
         flt (hpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0))]
     (* env flt)))
 
-(definst bass [note 60 amp 0.7 osc-mix 0.6 cutoff 0.4 sustain 0.15 release 0.25 fil-dec 0.15 fil-amt 1250]
+(definst bass [note 60 amp 0.7 osc-mix 0.6 cutoff 0.4 sustain 0.15 release 0.25 fil-dec 0.15 fil-amt 750]
   (let [note (- note 12)
         freq (midicps note)
         sub-freq (midicps (- note 12))
@@ -141,12 +178,12 @@
     (out 0 (* amp env snd))))
 
 (def my-piano
-  (partial sampled-piano :level 1.0 :pos 2500 :decay 0.01 :cutoff 0.65))
+  (partial sampled-piano :level 1.0 :pos 1500 :decay 0.01 :cutoff 0.65))
 
 (comment
   (sampled-piano :note (note :C4))
   (sampled-piano :note (note :A4))
-  (sampled-piano :cutoff 0.6)
+  (sampled-piano :cutoff 0.1)
   (reset! *pats h_pats)
   (reset! *pats {})
   (swap! *pats assoc h_snare #{1 3 5 25/4 7})
@@ -157,6 +194,7 @@
   (swap! *pats assoc h_kick #{0 4})
   (swap! *pats assoc h_ohat #{11/4 7/2 (+ 4 11/4) (+ 4 7/2)})
   (let [nome (metronome 122) beat (nome)]
+    (live-sequencer nome beat *house-beats 1/4 0)
     (sequencer nome beat *pats 1/4 8)
     (player follow {} nome beat #'my-piano 16 64)
     (player follow-bass {} nome beat #'bass 16 64))
