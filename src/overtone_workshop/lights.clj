@@ -3,7 +3,7 @@
   (:require [overtone-workshop.player :refer :all]
             [overtone-workshop.patterns :refer :all]))
 
-(definst bass [note 60 fine 0.12 cutoff 0.62 amp 0.7 sustain 0.4 release 0.15]
+(definst bass [note 60 fine 0.12 cutoff 0.52 amp 0.7 sustain 0.4 release 0.15]
   (let [freq (midicps note)
         osc1 (saw freq)
         snd  (mix [osc1])
@@ -11,26 +11,27 @@
       env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
   (pan2 (* snd env amp))))
 
-(definst bass [note 60 fine 0.12 cutoff 0.62 amp 1.2 sustain 0.4 release 0.15]
-  (let [freq (midicps note)
-        osc1 (saw freq)
-        osc2 (saw (midicps (+ note fine)))
-        snd  (mix [osc1 osc2])
-        snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
-        env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
-    (pan2 (* snd env amp))))
+(comment
+  (definst bass [note 60 fine 0.12 cutoff 0.62 amp 1.2 sustain 0.4 release 0.15]
+    (let [freq (midicps note)
+          osc1 (saw freq)
+          osc2 (saw (midicps (+ note fine)))
+          snd  (mix [osc1 osc2])
+          snd  (rlpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0) 0.65)
+          env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
+      (pan2 (* snd env amp))))
 
-(definst bass [note 60 fine 0.12 cutoff 0.43 contour 0.45 sub-amp 0.5 amp 0.9 sustain 0.4 release 0.15]
-  (let [freq (midicps note)
-        osc1 (saw freq)
-        osc2 (saw (midicps (+ note fine)))
-        sub  (* sub-amp (pulse (/ freq 2)))
-        snd  (mix [osc1 osc2 sub])
-        fil-env (env-gen (adsr 0.1 0.75 0.1 0.2))
-        snd  (rlpf snd (+ (* fil-env (* contour 10000))
-                          (lin-exp cutoff 0.0 1.0 20.0 20000.0)) 0.65)
-        env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
-    (pan2 (* snd env amp))))
+  (definst bass [note 60 fine 0.12 cutoff 0.43 contour 0.45 sub-amp 0.5 amp 0.9 sustain 0.4 release 0.15]
+    (let [freq (midicps note)
+          osc1 (saw freq)
+          osc2 (saw (midicps (+ note fine)))
+          sub  (* sub-amp (pulse (/ freq 2)))
+          snd  (mix [osc1 osc2 sub])
+          fil-env (env-gen (adsr 0.1 0.75 0.1 0.2))
+          snd  (rlpf snd (+ (* fil-env (* contour 10000))
+                            (lin-exp cutoff 0.0 1.0 20.0 20000.0)) 0.65)
+          env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
+      (pan2 (* snd env amp)))))
 
 (definst bouncy [note 60 fine 0.12 del 0.4 amp 0.5 cutoff 0.67 release 2 mix 0.7]
   (let [freq (midicps (+ note fine))
@@ -112,10 +113,9 @@
 (comment
   (play-all)
   (reset! *beats patterns)
-  (swap! *bass assoc :amp 0.0)
   (swap! *strings assoc :amp 0.0)
-  (swap! *strings assoc :amp 0.4)
+  (swap! *strings assoc :amp 0.3)
   (swap! *bouncy assoc :amp 0.0)
-  (swap! *bouncy assoc :amp 0.55)
+  (swap! *bouncy assoc :amp 0.45)
   (stop))
 

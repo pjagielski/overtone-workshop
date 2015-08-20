@@ -40,35 +40,32 @@
   (remove-event-handler ::midi-player)
   (ctl x :gate 0))
 
-(comment
-  (midi-connected-devices)
-
-  (on-event [:midi :note-on]
-    (fn [{note :note}] (my-lead note))
-    ::midi-player)
-  (remove-event-handler ::midi-player)
-
-  (def chords {60 [:B6 :G6 :B5 :G5 :B4]
+(def chords {60 [:B6 :G6 :B5 :G5 :B4]
                61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
                62 [:C7 :E6 :C6 :G5 :C5]
                63 [:F#7 :D7 :F#6 :D6 :A5 :D5]
                67 [:G7 :E7 :G6 :E6 :B5 :E5]})
-  (def l (partial my-lead :sustain 0.2))
+(def l (partial my-lead :sustain 0.2)) 
+(def drums {60 kick 61 snare 62 hat})
+
+(comment
+  (on-event [:midi :note-on]
+    (fn [{note :note}] (my-lead note))
+    ::midi-player)
+  
   (on-event [:midi :note-on]
     (fn [{n :note}] (play-chord (map note (get chords n)) l))
     ::midi-player)
-  (remove-event-handler ::midi-player)
 
-  (def drums {60 kick 61 snare 62 hat})
   (on-event [:midi :note-on]
     (fn [{n :note}] (apply (get drums n) []))
     ::midi-player)
-  (remove-event-handler ::midi-player)
 
   (on-event [:midi :note-on]
     (fn [{n :note}] (apply (get dp n) []))
     ::midi-player)
-  (remove-event-handler ::midi-player) )
+
+  (remove-event-handler ::midi-player))
 
 (def synth-controls (atom {}))
 (#_ (swap! synth-controls assoc :cutoff 0.43 :fil-amt 1000 :fil-dec 0.5))
@@ -87,28 +84,22 @@
                       11 {:param :fil-amt :min 0.0 :max 4500}
                        1 {:param :fil-dec :min 0.1 :max 1.5}}))
 
-(def daft-kick (freesound-sample 177908))
-(def clap (freesound-sample 196250))
-(def fat-kick (sample "resources/fat_kick.aif"))
-
 (def play-bass
   (partial play-with-controls #'bass synth-controls))
 
 (comment
+  (untztrument synth-controls *controls)
+  (let [nome (metronome 128) beat (nome)]
+    (player letsgo-bass {} nome beat play-bass 16 64))
+  (stop)
+  (remove-event-handler ::untztrument-control))
+
+(comment
   (def d (dubstep))
-  (def wobble {60 2 61 4 62 8})
   (on-event [:midi :note-on]
     (fn [{note :note}]
       (ctl d :note (- note 24))
       (ctl d :wobble (mod (* (rand 4) note) 8)))
     ::midi-player)
   (remove-event-handler ::midi-player)
-  (stop))
-
-(comment
-  (untztrument play-bass synth-controls *controls)
-  (remove-event-handler ::untztrument-note)
-  (remove-event-handler ::untztrument-control)
-  (let [nome (metronome 128) beat (nome)]
-    (player letsgo-bass {} nome beat play-bass 16 64))
   (stop))

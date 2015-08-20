@@ -178,7 +178,7 @@
     (out 0 (* amp env snd))))
 
 (def my-piano
-  (partial sampled-piano :level 1.0 :pos 1500 :decay 0.01 :cutoff 0.65))
+  (partial sampled-piano :level 1.0 :pos 500 :decay 0.01 :cutoff 0.65))
 
 (comment
   (sampled-piano :note (note :C4))
@@ -186,7 +186,6 @@
   (sampled-piano :cutoff 0.1)
   (reset! *pats h_pats)
   (reset! *pats {})
-  (swap! *pats assoc h_snare #{1 3 5 25/4 7})
   (swap! *pats assoc h_snare #{1 3 5 7})
   (swap! *pats assoc h_clap #{1 3 5 7})
   (swap! *pats assoc h_kick #{0 2 5/4 4 6 15/2})

@@ -3,7 +3,6 @@
         [overtone.synth.stringed]))
 
 (def g (guitar))
-(stop)
 
 (comment
   (guitar-strum g :E :down 0.25)
@@ -77,13 +76,18 @@
     (guitar-strum g [-1 -1 -1 -1 -1 -1] :down 0.01 (+ t (* 4.5 dt)))))
 
 (comment
-  (let [g (guitar)
-        time (now)]
+  (let [g (guitar)]
     (ctl g :pre-amp 5.0 :distort 0.96
          :lp-freq 5000 :lp-rq 0.25
          :rvb-mix 0.5 :rvb-room 0.7 :rvb-damp 0.4)
-    (ddd0 g time)
-    (ddd1 g (+ time 2150))
-    (ddd1 g (+ time 4250))
-    (ddd1 g (+ time 5350))
-    (ddd2 g (+ time 6450))))
+    (ddd0 g (now)))
+  (let [g (guitar) nome (metronome 116) beat (nome)]
+    (ctl g :pre-amp 5.0 :distort 0.96
+         :lp-freq 5000 :lp-rq 0.25
+         :rvb-mix 0.5 :rvb-room 0.7 :rvb-damp 0.4)
+    (apply-at (nome beat) #(ddd0 g (nome beat)))
+    (apply-at (nome (+ 4 beat)) #(ddd1 g (nome (+ 4 beat))))
+    (apply-at (nome (+ 8 beat)) #(ddd1 g (nome (+ 8 beat))))
+    (apply-at (nome (+ 10 beat)) #(ddd1 g (nome (+ 10 beat))))
+    (apply-at (nome (+ 12 beat)) #(ddd2 g (nome (+ 12 beat))))))
+
