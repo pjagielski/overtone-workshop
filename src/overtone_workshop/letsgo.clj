@@ -4,23 +4,24 @@
             [overtone-workshop.patterns :refer :all]
             [overtone-workshop.sounds :refer :all]))
 
-(definst lead [note 60 release 0.3 amp 0.4 sub-gate 0.15]
+(definst lead [note 60 release 0.3 amp 0.0 sub-gate 0.0]
   (let [freq  (midicps note)
         freq2 (midicps (+ note 0.08))
         freq3 (midicps (+ note 0.16))
         freq4 (midicps (+ note 0.24))
         freq5 (midicps (- note 0.12))
-        osc   (saw [freq freq2 freq3 freq4 freq5])
+        osc   (saw [freq freq2 freq3 freq5])
         osc1  (lf-tri freq)
         sub   (lpf (pulse (* freq 0.5) 0.3) 500)
-        osc   (+ (* sub-gate sub) (* 0.05 osc1) (* amp osc))
+        osc   (+ (* sub-gate sub) (* 0.05 osc1) (* 0.5 osc))
         mix   (mix osc)
         env   (env-gen (env-lin 0.015 0.20 release) :action FREE)]
-    (pan2 (* mix env))))
+    (pan2 (* amp mix env))))
 
-(comment (lead :note 70))
-(def brvb (inst-fx! lead fx-freeverb))
-(comment (ctl brvb :room-size 0.45 :wet-dry 0.35 :dampening 0.25))
+(comment (lead :note 70)
+  (def brvb (inst-fx! lead fx-freeverb))
+  (ctl brvb :room-size 0.85 :wet-dry 0.35 :dampening 0.25)
+  (clear-fx lead))
 
 (definst bass [note 60 amp 0.5 osc-mix 0.2 cutoff 0.35 sustain 0.2 release 0.15 fil-dec 0.85 fil-amt 1500]
   (let [freq (midicps note)
@@ -74,3 +75,4 @@
     (play-all nome)))
 
 (stop)
+

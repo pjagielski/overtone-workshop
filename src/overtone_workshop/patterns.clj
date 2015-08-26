@@ -3,24 +3,13 @@
 
 (def shrt {:sustain 0.1})
 
-(def letsgo {0  [:B6 :G6 :B5 :G5 :B4]
-             3  [:B6 :G6 :B5 :G5 :B4]
-             6  [:B6 :G6 :B5 :G5 :B4]
-             9  [:B6 :G6 :B5 :G5 :B4]
-             16 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
-             19 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
-             22 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
-             25 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
-             32 [:C7 :E6 :C6 :G5 :C5]
-             35 [:C7 :E6 :C6 :G5 :C5]
-             38 [:C7 :E6 :C6 :G5 :C5]
-             41 [:C7 :E6 :C6 :G5 :C5]
-             48 [:F#7 :D7 :F#6 :D6 :A5 :D5]
-             51 [:F#7 :D7 :F#6 :D6 :A5 :D5]
-             54 [:G7 :E7 :G6 :E6 :B5 :E5]
-             57 [:G7 :E7 :G6 :E6 :B5 :E5]})
-
-(zipmap [0 3 6 9] (repeat 4 [:B6 :G6 :B5 :G5 :B4]))
+(def letsgo
+  (merge
+    (zipmap [0 3 6 9] (repeat 4 [:B6 :G6 :B5 :G5 :B4]))
+    (zipmap [16 19 22 25] (repeat 4 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]))
+    (zipmap [32 35 38 41] (repeat 4 [:C7 :E6 :C6 :G5 :C5]))
+    (zipmap [48 51] (repeat 2 [:F#7 :D7 :F#6 :D6 :A5 :D5]))
+    (zipmap [54 57] (repeat 2 [:G7 :E7 :G6 :E6 :B5 :E5]))))
 
 (def letsgo-bass
   {0  [:E2] 3  [:E2] 6  [:E2] 9  [:E2] 11 [:E3] 12 [:E2] 14 [:E3]
@@ -123,9 +112,6 @@
 (def dafunk-ctrls
   {0 {:sustain 0.7} 14 {:sustain 0.8} 30 {:sustain 0.8} 46 {:sustain 0.8} 56 {:sustain 0.4} 60 {:sustain 0.4}})
 
-(def danse
-  {0 [:C4] 3 [:F4] 6 [:C5] 10 [:C5] 14 [:C5] 16 [:G#4] 19 [:C#5] 22 [:G4] 26 [:G4] 30 [:G4]})
-
 (def follow-chorus
   (merge
     (zipmap [0  4  8  11 14] (repeat 5 [:F3 :F4 :C5 :A4]))
@@ -200,5 +186,4 @@
       {46 [:F2] 47 [:F2]}
       (zipmap (range 48 58) (repeat 14 [:G#2]))
       (zipmap (range 58 64) (repeat 10 [:F2])))))
-
 

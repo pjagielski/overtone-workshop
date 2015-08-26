@@ -93,6 +93,7 @@
 (def voc (partial slicer :in daften :start 0 :end 38000 :amp 1.0 :fade 0.0))
 
 (comment
+  (daften)
   (voc))
 
 (def house-beats
@@ -100,14 +101,14 @@
    sd     [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ 1 ]
    clap   [_ _ _ _ 1 _ _ _ _ _ _ _ 1 _ _ _ ]
    h_hat  [_ _ 1 _ _ _ 1 1 _ _ 1 _ _ _ 1 1 ]
-   hihat  [_ _ _ 1 _ _ _ _ _ 1 _ 1 _ _ _ 1 ]
-   #'voc  [_ _ 1 _ _ _ _ _ _ _ _ _ _ _ _ 1 ]})
+   hihat  [_ _ _ 1 _ _ _ _ _ 1 _ 1 _ _ _ 1 ]})
 
 (def *house-beats (atom house-beats))
 
 (comment
   (let [nome (metronome 120) beat (nome)]
     (live-sequencer nome beat *house-beats 1/4 0))
+  (swap! *house-beats assoc voc [_ _ 1 _ _ _ _ _ _ _ _ _ _ _ _ 1])
   (stop))
 
 (def hip-hop
@@ -153,9 +154,6 @@
     (skrillex (dubstep (nome :bpm)) nome))
   (stop))
 
-(def h_pats {h_kick  #{0 1 2 3 4 5 6 7}})
-(def *pats (atom h_pats))
-
 (definst sampled-piano
   [note 60 level 1 rate 1 loop? 0 pos 0 attack 0 decay 1 sustain 1 release 0.1 curve -4 gate 1 cutoff 0.5]
   (let [buf (index:kr (:id index-buffer) note)
@@ -164,11 +162,11 @@
         flt (hpf snd (lin-exp cutoff 0.0 1.0 20.0 20000.0))]
     (* env flt)))
 
-(definst bass [note 60 amp 0.7 osc-mix 0.6 cutoff 0.4 sustain 0.15 release 0.25 fil-dec 0.15 fil-amt 750]
+(definst bass [note 60 amp 0.7 osc-mix 0.6 cutoff 0.4 sustain 0.1 release 0.25 fil-dec 0.10 fil-amt 750]
   (let [note (- note 12)
         freq (midicps note)
         sub-freq (midicps (- note 12))
-        osc1 (saw:ar freq)
+        osc1 (saw freq)
         osc2 (pulse sub-freq 0.5)
         osc (+ (* osc-mix osc2) (* (- 1 osc-mix) osc1))
         snd [osc osc]
@@ -178,23 +176,18 @@
     (out 0 (* amp env snd))))
 
 (def my-piano
-  (partial sampled-piano :level 1.0 :pos 500 :decay 0.01 :cutoff 0.65))
+  (partial sampled-piano :level 1.0 :pos 500 :decay 0.01 :cutoff 0.55))
 
 (comment
+  (bass)
   (sampled-piano :note (note :C4))
   (sampled-piano :note (note :A4))
   (sampled-piano :cutoff 0.1)
-  (reset! *pats h_pats)
-  (reset! *pats {})
-  (swap! *pats assoc h_snare #{1 3 5 7})
-  (swap! *pats assoc h_clap #{1 3 5 7})
-  (swap! *pats assoc h_kick #{0 2 5/4 4 6 15/2})
-  (swap! *pats assoc h_hat (into #{} (range 0 8 1/2)))
-  (swap! *pats assoc h_kick #{0 4})
-  (swap! *pats assoc h_ohat #{11/4 7/2 (+ 4 11/4) (+ 4 7/2)})
+  (sampled-piano :cutoff 0.55)
+  (reset! *house-beats {})
+  (reset! *house-beats house-beats)
   (let [nome (metronome 122) beat (nome)]
     (live-sequencer nome beat *house-beats 1/4 0)
-    (sequencer nome beat *pats 1/4 8)
     (player follow {} nome beat #'my-piano 16 64)
     (player follow-bass {} nome beat #'bass 16 64))
   (stop))

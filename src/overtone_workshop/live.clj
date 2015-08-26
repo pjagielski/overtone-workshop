@@ -4,8 +4,7 @@
             [overtone-workshop.player :refer :all]
             [overtone-workshop.patterns :refer :all]
             [overtone-workshop.untztrument :refer :all]
-            [overtone-workshop.sampler :refer :all]
-            [overtone-workshop.timing :refer [sampled-piano]]))
+            [overtone-workshop.sampler :refer :all]))
 
 (def kick_l    (sample "resources/kick.wav"))
 (def kick      (sample "resources/kick2.wav"))
@@ -38,7 +37,7 @@
 (def daften-clip (partial slicer :in daften :start 1000 :end 38000 :amp 1.0))
 (def phoenix-clip (partial slicer :in phoenix :start 50000 :end 125000 :amp 1.0 :rate 1.08))
 (def techo-clip (partial sampler techno :amp 0.75 :rate 1.01))
-(def ptoyl-clip (partial sampler ptoyl :amp 0.75 :rate 1.02))
+(def ptoyl-clip (partial sampler ptoyl :amp 0.65 :rate 1.02))
 
 (def b (audio-bus))
 
@@ -157,17 +156,8 @@
 
 (def play-bass (partial play-with-controls #'my-bass *bass))
 
-(def *piano (atom {:level 0.0 :cutoff 0.65 :pos 500 :decay 0.01}))
-
-(def *piano-controls
-  (atom {13 {:param :level :min 0.0 :max 1.0}
-          1 {:param :cutoff :mix 0.0 :max 1.0}}))
-
-(def play-piano (partial play-with-controls #'sampled-piano *piano))
-
 (defn play-all []
   (let [nome (metronome 128) beat (nome)]
-    (player follow-chorus {} nome beat #'play-piano 16 64)
     (sequencer nome beat *vocals 1/4 16)
     (player giorgio {} nome beat #'play-pad 16 64)
     (player around-arp-low {} nome beat #'play-arp-low 16 64)
@@ -186,6 +176,8 @@
 
 (def *pad-controls (atom {13 {:param :amp :min 0 :max 1.0}
                           11 {:param :release :min 0 :max 1.0}}))
+
+(def *dummy-synth (atom {}))
 
 (defn hihats []
   (swap! *beats assoc close-hat (into #{} (range 0 8 1)))
@@ -210,6 +202,7 @@
   (dosync
     (reset! *beats beats)
     (swap! *vocals clear-vals)
+    (swap! *vocals assoc s-around1 #{3/2})
     (untztrument *arp-low *controls)
     (swap! *arp assoc :amp 0.5 :filt 6 :decay 0.4 :coef 0.1)))
 
@@ -226,14 +219,17 @@
   (stop)
   (play-all)
   (full-beats)
+  (snares)
+  (hihats)
   (part2)
-  (swap! *beats assoc kick_l (into #{} (range 0 8 1/2)))
-  (swap! *beats assoc kick (into #{} (range 0 8 1/8)))
-  (swap! *beats assoc snare (into #{} (->> (range 0 8 1/2) (remove #(= 0 (mod % 4))))))
-  (swap! *beats assoc clap (into #{} (range 3/4 8 3/4)))
+  (swap! *beats assoc kick_l (into #{} (range 0 8 1/4)))
+  (swap! *beats assoc kick (into #{} (range 0 8 1/4)))
+  (swap! *beats assoc snare (into #{} (->> (range 0 8 3/4) (remove #(= 0 (mod % 1))))))
+  (swap! *beats assoc clap (into #{} (range 1/4 8 3/2)))
   (swap! *beats assoc tom (into #{} (range 1/4 8 5/4)))
-  (swap! *beats assoc close-hat (into #{} (->> (range 0 8 1/4) (remove #(= 0 (mod % 3/4))))))
+  (swap! *beats assoc close-hat (into #{} (->> (range 0 8 3/4) (remove #(= 0 (mod % 3/2))))))
   (swap! *beats assoc tom #{})
+  (untztrument *dummy-synth *pad-controls)
   (untztrument *pad *pad-controls)
   (untztrument *bass *cut-controls)
   (untztrument *arp-low *controls)
@@ -255,7 +251,8 @@
   (swap! *bass assoc :amp 0.2 :cutoff 0.85 :rq 0.5)
   (swap! *beats-flt assoc :cutoff 0.99)
   (dosync
-    (swap! *bass assoc :amp 0.0)
+    (untztrument *bass *cut-controls)
+    (swap! *bass assoc :amp 0.05)
     (swap! *arp assoc :amp 0)
     (swap! *arp-low assoc :amp 0))
   (swap! *arp-low assoc :amp 0.9)
@@ -266,6 +263,6 @@
   (comment
     (swap! *vocals assoc ptoyl-clip #{4})
     (swap! *vocals assoc techo-clip #{0 8})
-    (swap! *vocals assoc s-around1 #{3/2} s-around2-0 #{})
+    (swap! *vocals assoc s-around1 #{3/2})
     (swap! *vocals assoc s-around1 #{3/2} s-around2-0 #{9/2})))
 (stop)

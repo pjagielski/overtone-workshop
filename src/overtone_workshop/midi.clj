@@ -41,18 +41,18 @@
   (ctl x :gate 0))
 
 (def chords {60 [:B6 :G6 :B5 :G5 :B4]
-               61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
-               62 [:C7 :E6 :C6 :G5 :C5]
-               63 [:F#7 :D7 :F#6 :D6 :A5 :D5]
-               67 [:G7 :E7 :G6 :E6 :B5 :E5]})
-(def l (partial my-lead :sustain 0.2)) 
+             61 [:E7 :B6 :G6 :E6 :B5 :G5 :B4]
+             62 [:C7 :E6 :C6 :G5 :C5]
+             63 [:F#7 :D7 :F#6 :D6 :A5 :D5]
+             67 [:G7 :E7 :G6 :E6 :B5 :E5]})
+(def l (partial my-lead :sustain 0.2))
 (def drums {60 kick 61 snare 62 hat})
 
 (comment
   (on-event [:midi :note-on]
     (fn [{note :note}] (my-lead note))
     ::midi-player)
-  
+
   (on-event [:midi :note-on]
     (fn [{n :note}] (play-chord (map note (get chords n)) l))
     ::midi-player)
@@ -96,6 +96,7 @@
 
 (comment
   (def d (dubstep))
+  (ctl d :wobble 8 :note 52)
   (on-event [:midi :note-on]
     (fn [{note :note}]
       (ctl d :note (- note 24))

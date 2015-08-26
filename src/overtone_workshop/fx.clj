@@ -27,6 +27,7 @@
 (comment
   (gold-strings :freq (midi->hz 72) :sustain 0.5)
   (gold-strings :freq (midi->hz 68) :sustain 1.5)
+  (gold-strings :freq (midi->hz 68) :sustain 0.5)
   (gold-strings :freq (midi->hz 61) :sustain 1.5)
   (inst-fx! gold-strings fx-chorus2)
   (clear-fx gold-strings))
@@ -35,15 +36,10 @@
 
 (def play-ks1 (partial ks1-demo))
 
-(defsynth fx-chorus2 [bus 0]
-  (let [source (in bus)
-        snd (delay-c:ar source
-                        (ranged-rand 0.005 0.02) (lf-noise1:kr (i-rand 4.5 10.5)))]
-    (replace-out bus snd)))
-
 (comment
   (player derezed {} nome (nome) play-ks1 8 32)
   (inst-fx! ks1-demo fx-distortion)
+  (inst-fx! ks1-demo fx-chorus2)
   (clear-fx ks1-demo)
   (stop))
 

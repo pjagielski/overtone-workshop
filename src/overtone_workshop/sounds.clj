@@ -37,8 +37,9 @@
 
 ;; notes
 (note :C4)
-(midi->hz (note :c3))
-(midi->hz (note :c4))
+(note :C5)
+(midi->hz (note :C3))
+(midi->hz (note :C4))
 
 ;; synth
 (defsynth my-saw [note 60]
@@ -93,7 +94,6 @@
   (ctl m :osc2-semi 0.08)
   (ctl m :osc2-semi 0.16)
   (ctl m :osc2-semi 0.60)
-  (ctl m :osc2-semi 0.80)
   (stop))
 
 (comment
@@ -108,13 +108,14 @@
 
 (definst my-env-synth [note 60 attack 0.01 sustain 0.4 release 0.1]
  (* (env-gen (env-lin attack sustain release))
-     (sin-osc (* 0.5 (midicps note)))))
+     (sin-osc (midicps note))))
 
 (comment
   (my-env-synth)
   (my-env-synth :sustain 1.0)
   (my-env-synth :attack 0.5)
-  (my-env-synth :attack 0.5 :release 0.5))
+  (my-env-synth :attack 0.5 :release 0.5)
+  (my-env-synth :attack 0.1 :sustain 0.1 :release 0.1))
 
 ;; chords
 (defn play-chord [a-chord inst]

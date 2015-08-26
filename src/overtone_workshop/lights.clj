@@ -21,7 +21,7 @@
           env  (env-gen (env-lin 0.01 sustain release) 1 1 0 1 FREE)]
       (pan2 (* snd env amp))))
 
-  (definst bass [note 60 fine 0.12 cutoff 0.43 contour 0.45 sub-amp 0.5 amp 0.9 sustain 0.4 release 0.15]
+  (definst bass [note 60 fine 0.12 cutoff 0.33 contour 0.45 sub-amp 0.5 amp 0.9 sustain 0.4 release 0.15]
     (let [freq (midicps note)
           osc1 (saw freq)
           osc2 (saw (midicps (+ note fine)))
