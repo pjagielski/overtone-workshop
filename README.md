@@ -53,5 +53,7 @@ Basic introduction to sound synthesis, rhythms and effects using [Overtone](http
 
 Copyright © 2015 Piotr Jagielski
 
+Samples © Daft Punk and respective owners
+
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
