@@ -4,7 +4,7 @@ Basic introduction to sound synthesis, rhythms and effects using [Overtone](http
 
 ## Interacting with code
 
-* Install [lein](https://github.com/technomancy/leiningen)
+* Install [lein](https://github.com/technomancy/leiningen#installation)
 
 * Install [jack](https://github.com/overtone/overtone/wiki/Installing-and-starting-jack) (linux only) 
 
