@@ -4,14 +4,16 @@ Basic introduction to sound synthesis, rhythms and effects using [Overtone](http
 
 ## Interacting with code
 
-Install [lein](https://github.com/technomancy/leiningen)
+* Install [lein](https://github.com/technomancy/leiningen)
 
-Install [jack](https://github.com/overtone/overtone/wiki/Installing-and-starting-jack) (linux only) 
+* Install [jack](https://github.com/overtone/overtone/wiki/Installing-and-starting-jack) (linux only) 
 
-`lein repl`
+* Run `lein repl` and wait for prompt.
+
+* Inside REPL run
 
 ```clojure
-(use 'overtone.live)
+(use 'overtone.live) ; this would take a while
 (use 'overtone-workshop.letsgo)
 (play-all (metronome 128))
 (stop)
