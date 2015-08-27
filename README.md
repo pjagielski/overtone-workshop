@@ -22,7 +22,7 @@ Basic introduction to sound synthesis, rhythms and effects using [Overtone](http
 
 ### Intellij IDEA
 
-* Install [Cusive Clojure](https://cursiveclojure.com/userguide)
+* Install [Cursive Clojure](https://cursiveclojure.com/userguide)
 * File -> Open -> overtone-workshop
 * Run -> Edit Configurations
 * Add -> Clojure REPL -> Local, name: overtone-workshop
