@@ -16,13 +16,7 @@
 (def clap (sample "resources/clap.wav"))
 (def congall (sample "resources/congall.wav"))
 (def daften (sample "resources/daft/dafunk.aif"))
-
-(def h_kick (sample "resources/house/kick.wav"))
-(def f_kick (sample "resources/house/fat_bd.wav"))
-(def h_clap (sample "resources/house/clap.wav"))
-(def h_snare (sample "resources/house/snare.wav"))
 (def h_hat (sample "resources/daft/close_hat.aif"))
-(def h_ohat (sample "resources/daft/open_hat.aif"))
 
 (comment
   (kick)
