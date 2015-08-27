@@ -36,7 +36,7 @@ Basic introduction to sound synthesis, rhythms and effects using [Overtone](http
 ### Vim
  * Install [vim-fireplace](https://github.com/tpope/vim-fireplace)
  * Run `lein repl` and wait for prompt
- * Open `sounds.clj`
+ * In anothen terminal open `sounds.clj` in Vim
  * Run `:Eval` inside Vim
  * Point to start of expression and run `cpp`
  * Enjoy!
